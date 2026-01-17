@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/stephxue/Desktop/Code/overhacked/frontend/src/app/layout.tsx"],"sourcesContent":["import \"@/app/globals.css\";\n\nexport default function RootLayout({children}: {children: React.ReactNode;}) {\n  return (\n    <html lang=\"en\">\n      <body className=\"min-h-screen bg-black text-white\">\n        {children}\n      </body>\n    </html>\n  );\n}"],"names":[],"mappings":";;;;;;;AAEe,SAAS,WAAW,EAAC,QAAQ,EAA+B;IACzE,qBACE,8OAAC;QAAK,MAAK;kBACT,cAAA,8OAAC;YAAK,WAAU;sBACb;;;;;;;;;;;AAIT"}},
+    {"offset": {"line": 32, "column": 0}, "map": {"version":3,"sources":["file:///Users/stephxue/Desktop/Code/overhacked/frontend/node_modules/next/src/server/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.ts"],"sourcesContent":["module.exports = (\n  require('../../module.compiled') as typeof import('../../module.compiled')\n).vendored['react-rsc']!.ReactJsxDevRuntime\n"],"names":["module","exports","require","vendored","ReactJsxDevRuntime"],"mappings":"AAAAA,OAAOC,OAAO,GACZC,QAAQ,4HACRC,QAAQ,CAAC,YAAY,CAAEC,kBAAkB","ignoreList":[0]}}]
+}
