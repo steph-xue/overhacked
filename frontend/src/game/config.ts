@@ -21,6 +21,11 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
       arcade: { debug: false },
     },
 
+    render: {
+        pixelArt: true,
+        antialias: false,
+    },
+
     scene: [HackathonScene],
   };
 }
