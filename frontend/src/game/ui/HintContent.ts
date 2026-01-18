@@ -25,23 +25,26 @@ export default class HintContent {
   mount() {
     const s = this.scene;
 
+    const TOP_OFFSET = 20;
+
     // Panel background
     const bg = s.add
-      .rectangle(0, 0, this.width, this.height, 0x000000, 0.06)
-      .setOrigin(0, 0);
+        .rectangle(0, TOP_OFFSET, this.width, this.height - TOP_OFFSET, 0x000000, 0.06)
+        .setOrigin(0, 0);
 
     const border = s.add
-      .rectangle(0, 0, this.width, this.height, 0x000000, 0.12)
-      .setOrigin(0, 0);
+        .rectangle(0, TOP_OFFSET, this.width, this.height - TOP_OFFSET, 0x000000, 0.12)
+        .setOrigin(0, 0);
 
-    // Title (centered)
     const title = s.add
-      .text(this.width / 2, 12, "Mentor", {
-        fontFamily: "monospace",
-        fontSize: "50px",
-        color: "#000000",
-      })
-      .setOrigin(0.5, 0);
+        .text(this.width / 2, TOP_OFFSET + 12, "Mentor", {
+            fontFamily: "Silkscreen",
+            fontStyle: "bold",
+            fontSize: "40px",
+            color: "#4A3F35",
+        })
+        .setOrigin(0.5, 0);
+
 
     // Mentor sprite (animated). Assumes "mentor-idle" exists already.
     const mentorSprite = s.add
@@ -61,12 +64,12 @@ export default class HintContent {
     const imgScale = Math.min(maxImgW / fw, maxImgH / fh);
     mentorSprite.setScale(imgScale);
 
-    // Hint (hard-coded for now)
+    // Hint 
     const hint = s.add
       .text(14, this.height - 14, "Hint: Try eliminating obviously wrong answers first.", {
-        fontFamily: "monospace",
-        fontSize: "18px",
-        color: "#000000",
+        fontFamily: "Silkscreen",
+        fontSize: "25px",
+        color: "#4A3F35",
         wordWrap: { width: this.width - 28 },
       })
       .setOrigin(0, 1);
