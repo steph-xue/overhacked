@@ -22,6 +22,9 @@ import useUserStore from "@/stores/useUserStore";
  * - "Press E to talk" prompt
  * - Opens a Dialog with specified content type
  */
+
+type MinigameType = "multipleChoice" | "dragAndDrop";
+
 export default class HackathonScene extends Phaser.Scene {
   // =========================
   // Core scene objects
@@ -40,14 +43,17 @@ export default class HackathonScene extends Phaser.Scene {
   // Interaction / UI
   // =========================
   private keyE!: Phaser.Input.Keyboard.Key;
-  private keyD!: Phaser.Input.Keyboard.Key;
   private talkPrompt!: Phaser.GameObjects.Text;
 
   // =========================
   // NPC tracking
   // =========================
-  private npcs: Phaser.GameObjects.Sprite[] = [];
-  private nearNpc: Phaser.GameObjects.Sprite | null = null;
+  private npcs: { sprite: Phaser.GameObjects.Sprite; game: MinigameType }[] =
+    [];
+  private nearNpc: {
+    sprite: Phaser.GameObjects.Sprite;
+    game: MinigameType;
+  } | null = null;
   private npcFetchToken = 0;
 
   // =========================
@@ -130,6 +136,23 @@ export default class HackathonScene extends Phaser.Scene {
   // Scene setup
   // =========================
   create() {
+    // --- Reset per-run state (important for scene.restart)
+    this.loadingDialog?.destroy();
+    this.loadingDialog = undefined;
+
+    this.winDialog?.unmount();
+    this.winDialog = undefined;
+
+    this.gameOver?.unmount();
+    this.gameOver = undefined;
+
+    this.hasWon = false;
+    this.completedChallenges = 0;
+    this.npcFetchToken = 0;
+
+    // IMPORTANT: prevent stacking listeners across restarts
+    this.events.off("mcq-answered");
+
     // Ensure crisp pixel rendering
     this.textures.get("player").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("npc1").setFilter(Phaser.Textures.FilterMode.NEAREST);
@@ -142,7 +165,6 @@ export default class HackathonScene extends Phaser.Scene {
     // Input
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.keyE = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-    this.keyD = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
     // =========================
     // Background
@@ -168,6 +190,12 @@ export default class HackathonScene extends Phaser.Scene {
     // =========================
     // Music
     // =========================
+    // Prevents double music on restart
+    this.sound.stopByKey("bgm");
+    this.bgm?.stop();
+    this.bgm?.destroy();
+    this.bgm = undefined;
+
     this.bgm = this.sound.add("bgm", { loop: true, volume: 0.5 });
     this.bgm.play();
 
@@ -229,13 +257,13 @@ export default class HackathonScene extends Phaser.Scene {
     // =========================
     // NPCs
     // =========================
-    const npc1 = this.spawnNpc(250, 300, "npc1");
-    const npc2 = this.spawnNpc(800, 600, "npc2");
-    const npc3 = this.spawnNpc(1250, 300, "npc3");
-    const npc4 = this.spawnNpc(200, 800, "npc4");
-    const npc5 = this.spawnNpc(1350, 730, "npc5");
-
-    this.npcs = [npc1, npc2, npc3, npc4, npc5];
+    this.npcs = [
+      { sprite: this.spawnNpc(250, 300, "npc1"), game: "multipleChoice" },
+      { sprite: this.spawnNpc(800, 600, "npc2"), game: "multipleChoice" },
+      { sprite: this.spawnNpc(1250, 300, "npc3"), game: "dragAndDrop" },
+      { sprite: this.spawnNpc(200, 800, "npc4"), game: "dragAndDrop" },
+      { sprite: this.spawnNpc(1350, 730, "npc5"), game: "multipleChoice" },
+    ];
 
     // Tiny collision boxes near NPC feet
     addSolidRect(250, 245, 10, 10);
@@ -434,17 +462,22 @@ export default class HackathonScene extends Phaser.Scene {
   }
 
   private updateNpcInteraction() {
-    const TALK_RADIUS = 120;
-    let closest: Phaser.GameObjects.Sprite | null = null;
+    const TALK_RADIUS = 200;
+    let closest: {
+      sprite: Phaser.GameObjects.Sprite;
+      game: MinigameType;
+    } | null = null;
     let closestDist = Infinity;
+
 
     for (const npc of this.npcs) {
       const d = Phaser.Math.Distance.Between(
         this.player.x,
         this.player.y,
-        npc.x,
-        npc.y,
+        npc.sprite.x,
+        npc.sprite.y,
       );
+
       if (d < TALK_RADIUS && d < closestDist) {
         closest = npc;
         closestDist = d;
@@ -453,38 +486,40 @@ export default class HackathonScene extends Phaser.Scene {
 
     this.nearNpc = closest;
 
-    if (this.nearNpc) {
-      this.talkPrompt.setVisible(true);
-      this.talkPrompt.setPosition(this.nearNpc.x, this.nearNpc.y - 125);
-
-      if (Phaser.Input.Keyboard.JustDown(this.keyE)) {
-        const { data, loading, error } = useNpcStore.getState();
-
-        if (error) {
-          console.log("NPC error:", error);
-          return;
-        }
-
-        // If already fetching, just show loading UI
-        if (loading) {
-          this.showLoading();
-          return;
-        }
-
-        // If we don't have data yet, fetch it (and show loading immediately)
-        if (!data) {
-          void this.openNpcMinigame(); // open loading -> await fetch -> swap to multipleChoice
-          return;
-        }
-
-        this.dialog.show("multipleChoice");
-      } else if (Phaser.Input.Keyboard.JustDown(this.keyD)) {
-        this.dialog.show("dragAndDrop");
-      }
-    } else {
+    if (!this.nearNpc) {
       this.talkPrompt.setVisible(false);
       this.cancelNpcLoading();
+      return;
     }
+
+    // show prompt while near
+    this.talkPrompt.setVisible(true);
+    this.talkPrompt.setPosition(this.nearNpc.sprite.x, this.nearNpc.sprite.y - 125);
+
+    // only act on key press
+    if (!Phaser.Input.Keyboard.JustDown(this.keyE)) return;
+
+ 
+      const { data, loading, error } = useNpcStore.getState();
+
+      if (error) {
+        console.log("NPC error:", error);
+        return;
+      }
+
+      // If already fetching, just show loading UI
+      if (loading) {
+        this.showLoading();
+        return;
+      }
+
+      // If we don't have data yet, fetch it (and show loading immediately)
+      if (!data) {
+        void this.openNpcMinigame(); // open loading -> await fetch -> swap to multipleChoice
+        return;
+      }
+
+      this.dialog.show(this.nearNpc.game);
   }
 
   // =========================
@@ -599,5 +634,12 @@ export default class HackathonScene extends Phaser.Scene {
     this.scoreBoard?.unmount();
     this.gameOver?.unmount();
     this.winDialog?.unmount();
+
+    this.sound.stopByKey("bgm");
+    this.bgm?.stop();
+    this.bgm?.destroy();
+    this.bgm = undefined;
+
+    this.scale.off("resize", this.fitBackground, this);
   }
 }

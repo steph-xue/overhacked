@@ -57,7 +57,7 @@ export default class MultipleChoiceContents {
         "Inheritance",
         "Polymorphism",
       ],
-      answer: 2,
+      answer: 3,
     };
 
     if (loading) {
@@ -74,7 +74,7 @@ export default class MultipleChoiceContents {
     const questionData: QuestionData = error || !data ? fallback : data;
 
     const { question, choices, answer } = questionData;
-    this.correctIndex = answer;
+    this.correctIndex = Phaser.Math.Clamp(answer - 1, 0, choices.length - 1);
 
     // -------------------------
     // QUESTION TITLE + TEXT
