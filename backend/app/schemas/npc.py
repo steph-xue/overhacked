@@ -1,7 +1,7 @@
 # Router lets you group endpoints together
 from fastapi import APIRouter
 # Allows us to define data to be expected, type for each field
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List, Literal, Union
 
 # This is the router for all NPC-related endpoints (NON-MENTOR ONLY)
@@ -26,6 +26,16 @@ class MCQRequest(BaseModel):
     experience: int
     language: str
 
+class CodingQuizRequest(BaseModel):
+    language: str = Field(..., examples=["Java", "Python", "C#"])
+    experience: int = Field(..., ge=0, le=50, examples=[0, 2, 5])
+    username: Optional[str] = Field(None, examples=["Sam"])  # only if you want personalization
+
+class CodingQuizResponse(BaseModel):
+    question: str
+    answer: List[str]  # each element is one line, preserving formatting
+    hints: Optional[List[str]] = None  # include only if you generate hints too
+    
 # The Drag and Drop Item structure
 class DragDropItem(BaseModel):
     id: str

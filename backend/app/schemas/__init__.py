@@ -7,4 +7,6 @@ from .npc import (
     DragDrop_AnswerResponse,
     DebuggingResponse,
     Debugging_AnswerResponse,
+    CodingQuizRequest,
+    CodingQuizResponse
 )
