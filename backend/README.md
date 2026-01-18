@@ -31,7 +31,7 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 ### 5. Run the server
 ```bash
-uvicorn app:app --reload  --port 8000
+uvicorn main:app --reload  --port 8000
 ```
 The server will start at: http://127.0.0.1:8000
 
