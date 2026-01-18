@@ -221,5 +221,4 @@ export default class MultipleChoiceContents {
 
     this.onAnswered(isCorrect);
     }
-
 }

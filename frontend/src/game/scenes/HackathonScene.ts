@@ -305,9 +305,9 @@ export default class HackathonScene extends Phaser.Scene {
     // =========================
     this.npcs = [
       { sprite: this.spawnNpc(250, 300, "npc1"), game: "multipleChoice" },
-      { sprite: this.spawnNpc(800, 600, "npc2"), game: "multipleChoice" },
-      { sprite: this.spawnNpc(1250, 300, "npc3"), game: "dragAndDrop" },
-      { sprite: this.spawnNpc(200, 800, "npc4"), game: "dragAndDrop" },
+      { sprite: this.spawnNpc(800, 600, "npc2"), game: "dragAndDrop" },
+      { sprite: this.spawnNpc(1250, 300, "npc3"), game: "multipleChoice" },
+      { sprite: this.spawnNpc(200, 800, "npc4"), game: "multipleChoice" },
       { sprite: this.spawnNpc(1350, 730, "npc5"), game: "multipleChoice" },
     ];
 
