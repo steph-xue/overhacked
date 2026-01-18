@@ -38,11 +38,6 @@ export default function PhaserGame() {
         ref={containerRef}
         className="shrink-0 w-[90vw] max-w-[1400px] aspect-[16/9]"
       />
-
-      <div className="absolute top-5 right-10 z-50 pointer-events-none
-             bg-black/60 px-3 py-1 rounded text-white text-md">
-      </div>
-
     </div>
   );
 }

@@ -2,6 +2,7 @@ import * as Phaser from "phaser";
 import MiniGameDialog from "@/game/ui/MiniGameDialog";
 import { useNpcStore } from "@/stores/useNpcStore";
 import { useCodingQuizStore } from "@/stores/useCodingQuizStore";
+import { useDragDropStore } from "@/stores/useDragDropStore";
 import ScoreBoard from "@/game/ui/ScoreBoard";
 import GameOverDialog from "@/game/ui/GameOverDialog";
 import { use } from "react";
@@ -30,10 +31,14 @@ export default class HackathonScene extends Phaser.Scene {
 
   private playerName!: Phaser.GameObjects.Text;
 
+  // Testing to see if the music works
+  private bgm?: Phaser.Sound.BaseSound;
+
   // =========================
   // Interaction / UI
   // =========================
   private keyE!: Phaser.Input.Keyboard.Key;
+  private keyD!: Phaser.Input.Keyboard.Key;
   private talkPrompt!: Phaser.GameObjects.Text;
 
   // =========================
@@ -103,6 +108,9 @@ export default class HackathonScene extends Phaser.Scene {
       frameWidth: 24,
       frameHeight: 24,
     });
+
+    // Load the audio
+    this.load.audio("bgm", "/assets/audio/hackathon-audio.wav");
   }
 
   // =========================
@@ -121,6 +129,7 @@ export default class HackathonScene extends Phaser.Scene {
     // Input
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.keyE = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    this.keyD = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
     // =========================
     // Background
@@ -142,6 +151,12 @@ export default class HackathonScene extends Phaser.Scene {
     this.createPlayerAnims();
     this.createNpcAnims();
     this.createMentorAnims();
+
+    // =========================
+    // Music
+    // =========================
+    this.bgm = this.sound.add("bgm", { loop: true, volume: 0.5 });
+    this.bgm.play();
 
     // =========================
     // Player setup
@@ -267,6 +282,8 @@ export default class HackathonScene extends Phaser.Scene {
     // Start timer + progress
     this.scoreBoard.start(180); // 3 minutes
     this.scoreBoard.setProgress(0.5);
+    // Drag-and-Drop
+    useDragDropStore.getState().fetchDragDropData();
   }
 
   // =========================
@@ -398,6 +415,9 @@ export default class HackathonScene extends Phaser.Scene {
         if (data) {
           this.dialog.show("multipleChoice");
         }
+      }
+      else if( Phaser.Input.Keyboard.JustDown(this.keyD)) {
+        this.dialog.show("dragAndDrop");
       }
     } else {
       this.talkPrompt.setVisible(false);

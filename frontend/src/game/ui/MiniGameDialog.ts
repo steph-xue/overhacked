@@ -1,9 +1,10 @@
 // src/game/ui/Dialog.ts
 import * as Phaser from "phaser";
 import MultipleChoiceContents from "./MultipleChoiceContents";
+import DragAndDropContents from "./DragAndDropContents";
 import HintContent from "./HintContent";
 
-export type DialogContentType = "multipleChoice";
+export type DialogContentType = "multipleChoice" | "dragAndDrop";
 
 /**
  * Dialog shell:
@@ -44,6 +45,8 @@ export default class MiniGameDialog {
 
   private registry: Record<DialogContentType,() => { mount: () => void; unmount: () => void }> = {
     multipleChoice: () => new MultipleChoiceContents(this.scene, this.mainRoot, this.getMainContentWidth()),
+    dragAndDrop: () =>
+      new DragAndDropContents(this.scene, this.mainRoot, this.getMainContentWidth()),
   };
 
   constructor(

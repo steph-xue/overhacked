@@ -25,8 +25,8 @@ async def ask_agent(request: CodingQuizRequest) -> CodingQuizResponse:
     username = request.username
     
     coding_quiz_agent = Agent(
-        role=f"You are a specialist in OOP and create a coding quiz of {language} which is challenging but doable for a person who has {experience} years of experience in tech.",
-        goal=f"Create ONE coding quiz which appropreate difficulty for a person who has {experience} years of experience in tech.",
+        role=f"You are a specialist in computer science, and you are tasked with creating a coding quiz of {language} which is challenging but doable for a person who has {experience} years of experience in tech.",
+        goal=f"Create ONE coding quiz which is of appropriate difficulty for a person who has {experience} years of experience in tech.",
         llm=llm,
         backstory="You're working on education in computer science and are familiar with Object-Oriented-Programming. At the same time, you're good at creating quizzes for students who are learning OOP.",
     )
@@ -62,7 +62,7 @@ async def ask_agent(request: CodingQuizRequest) -> CodingQuizResponse:
     ]
     }}
 
-    Now create the quiz question and answer for {language} for a person with {experience} years of experience, following this JSON format exactly.
+    Now create the quiz question and answer for {language} for a person with {experience} years of experience, following this JSON format exactly. Make sure that your questions are also varied.
     """,
         agent=coding_quiz_agent
     )
@@ -96,6 +96,7 @@ async def ask_agent(request: CodingQuizRequest) -> CodingQuizResponse:
             "- Hint 2: suggest a class/method/field structure to consider.\n"
             "- Hint 3+: highlight common mistakes and edge cases.\n"
             "- Keep each hint 1–2 sentences.\n"
+            "- Make sure each hint is less than 40 characters long.\n"
             "- No markdown, no backticks, no extra keys."
         ),
         expected_output='{"hints": ["...", "...", "..."]}',
