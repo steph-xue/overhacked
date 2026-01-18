@@ -6,7 +6,11 @@ export default class LoadingDialog {
   private loadingText!: Phaser.GameObjects.Text;
   private dotTimer!: Phaser.Time.TimerEvent;
 
-  constructor(scene: Phaser.Scene) {
+  private onCancel?: () => void;
+
+  constructor(scene: Phaser.Scene, onCancel?: () => void) {
+    this.onCancel = onCancel;
+
     const W = 550;
     const H = 250;
 
@@ -16,28 +20,30 @@ export default class LoadingDialog {
     // Root container
     this.root = scene.add.container(cx, cy).setDepth(10_000);
 
-    // -------------------------
-    // Dim overlay
-    // -------------------------
+    // Dim overlay (blocks clicks behind)
     const overlay = scene.add
-      .rectangle(
-        0,
-        0,
-        scene.scale.width,
-        scene.scale.height,
-        0x000000,
-        0.35
-      )
-      .setOrigin(0.5);
+      .rectangle(0, 0, scene.scale.width, scene.scale.height, 0x000000, 0.35)
+      .setOrigin(0.5)
+      .setInteractive(); // block input behind dialog
 
-    // -------------------------
     // Panel (flat rectangle)
-    // -------------------------
     const panel = scene.add.rectangle(0, 0, W, H, 0xf3e9d9);
 
-    // -------------------------
+    // X / Cancel button
+    const closeBtn = scene.add
+      .text(W / 2 - 34, -H / 2 + 22, "X", {
+        fontFamily: "Silkscreen, monospace",
+        fontSize: "34px",
+        color: "#4A3F35",
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+
+    closeBtn.on("pointerdown", () => {
+      this.onCancel?.();
+    });
+
     // Animated "Loading..." text
-    // -------------------------
     this.loadingText = scene.add
       .text(0, -40, "Loading", {
         fontFamily: "Silkscreen, monospace",
@@ -57,11 +63,9 @@ export default class LoadingDialog {
       .setOrigin(0.5)
       .setResolution(2);
 
-    this.root.add([overlay, panel, this.loadingText, subtitle]);
+    this.root.add([overlay, panel, closeBtn, this.loadingText, subtitle]);
 
-    // -------------------------
     // Animate dots: Loading → Loading...
-    // -------------------------
     let dots = 0;
     this.dotTimer = scene.time.addEvent({
       delay: 450,
@@ -72,9 +76,7 @@ export default class LoadingDialog {
       },
     });
 
-    // -------------------------
     // Fade in
-    // -------------------------
     this.root.setAlpha(0);
     scene.tweens.add({
       targets: this.root,

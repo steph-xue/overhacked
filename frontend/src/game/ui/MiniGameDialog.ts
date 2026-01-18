@@ -44,7 +44,7 @@ export default class MiniGameDialog {
   private hintContent: HintContent | null = null;
 
   private registry: Record<DialogContentType,() => { mount: () => void; unmount: () => void }> = {
-    multipleChoice: () => new MultipleChoiceContents(this.scene, this.mainRoot, this.getMainContentWidth()),
+    multipleChoice: () => new MultipleChoiceContents(this.scene, this.mainRoot, this.getMainContentWidth(), (correct) => this.scene.events.emit("mcq-answered", correct)),
     dragAndDrop: () => new DragAndDropContents(this.scene, this.mainRoot, this.getMainContentWidth()),
   };
 
