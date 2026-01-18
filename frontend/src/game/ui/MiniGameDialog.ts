@@ -140,8 +140,8 @@ export default class Dialog {
     // Close button (top-right)
     const btnW = 42;
     const btnH = 32;
-    const btnX = this.panelW / 2 - 16 - btnW / 2;
-    const btnY = -this.panelH / 2 + 16 + btnH / 2;
+    const btnX = this.panelW / 2 - btnW / 2;
+    const btnY = -this.panelH / 2 + btnH / 2;
 
     const closeBg = s.add
       .rectangle(btnX, btnY, btnW, btnH, 0x000000, 0.12)
