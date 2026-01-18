@@ -3,6 +3,8 @@ import * as Phaser from "phaser";
 import MultipleChoiceContents from "./MultipleChoiceContents";
 import DragAndDropContents from "./DragAndDropContents";
 import HintContent from "./HintContent";
+import { useNpcStore } from "@/stores/useNpcStore";
+import { useCodingQuizStore } from "@/stores/useCodingQuizStore";
 
 export type DialogContentType = "multipleChoice" | "dragAndDrop";
 
@@ -40,12 +42,26 @@ export default class MiniGameDialog {
   private open = false;
   private currentType: DialogContentType | null = null;
 
-  private activeContent: { mount: () => void; unmount: () => void } | null = null;
+  private activeContent: { mount: () => void; unmount: () => void } | null =
+    null;
   private hintContent: HintContent | null = null;
 
-  private registry: Record<DialogContentType,() => { mount: () => void; unmount: () => void }> = {
-    multipleChoice: () => new MultipleChoiceContents(this.scene, this.mainRoot, this.getMainContentWidth()),
-    dragAndDrop: () => new DragAndDropContents(this.scene, this.mainRoot, this.getMainContentWidth()),
+  private registry: Record<
+    DialogContentType,
+    () => { mount: () => void; unmount: () => void }
+  > = {
+    multipleChoice: () =>
+      new MultipleChoiceContents(
+        this.scene,
+        this.mainRoot,
+        this.getMainContentWidth()
+      ),
+    dragAndDrop: () =>
+      new DragAndDropContents(
+        this.scene,
+        this.mainRoot,
+        this.getMainContentWidth()
+      ),
   };
 
   constructor(
@@ -92,11 +108,21 @@ export default class MiniGameDialog {
     this.unmountAll();
 
     const factory = this.registry[type];
-    if (!factory) throw new Error(`Dialog content type "${type}" not registered`);
+    if (!factory)
+      throw new Error(`Dialog content type "${type}" not registered`);
 
     // Mount left content
     this.activeContent = factory();
     this.activeContent.mount();
+
+    let hints: string[] = [];
+    if (type === "multipleChoice") {
+      const { data } = useNpcStore.getState();
+      hints = data?.hints ?? [];
+    } else if (type === "dragAndDrop") {
+      const { data } = useCodingQuizStore.getState();
+      hints = data?.hints ?? [];
+    }
 
     // Mount right hint content
     this.hintContent = new HintContent({
@@ -104,6 +130,7 @@ export default class MiniGameDialog {
       root: this.hintRoot,
       width: this.getHintWidth(),
       height: this.getInnerHeight(),
+      hints,
     });
     this.hintContent.mount();
 
