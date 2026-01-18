@@ -25,9 +25,10 @@ export default function StartHackingButton() {
         mt-10
         rounded-lg transition
         cursor-pointer
+        scale-100 hover:scale-105
     `}
         >
-          Enter Hackathon
+          Start Hackathon
         </button>
 
         {isOpen && <PopupForm onClose={() => setIsOpen(false)} />}

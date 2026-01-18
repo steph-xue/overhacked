@@ -56,6 +56,11 @@ export default class HackathonScene extends Phaser.Scene {
   } | null = null;
   private npcFetchToken = 0;
 
+  // NPC alert / marker state - FOR TESTING
+  private alertedNpc: Phaser.GameObjects.Sprite | null = null;
+  private npcAlertIcon = new Map<Phaser.GameObjects.Sprite, Phaser.GameObjects.Sprite>();
+  private npcIconTween?: Phaser.Tweens.Tween;
+
   // =========================
   // Dialog system
   // =========================
@@ -68,6 +73,7 @@ export default class HackathonScene extends Phaser.Scene {
   private scoreBoard!: ScoreBoard;
   private completedChallenges = 0;
   private readonly TOTAL_CHALLENGES = 3;
+  
 
   // =========================
   // Game over/win dialogs
@@ -75,6 +81,24 @@ export default class HackathonScene extends Phaser.Scene {
   private gameOver?: GameOverDialog;
   private winDialog?: WinningDialog;
   private hasWon = false;
+
+  // =========================
+    // Player state / alerts - For TESTING
+    // =========================
+    private lastActiveAt = 0;
+    private lastIdleNudgeAt = 0;
+    private lastRandomAlertAt = 0;
+
+    // tune these
+    private readonly IDLE_THRESHOLD_MS = 45_000;       // idle for 45s
+    private readonly IDLE_NUDGE_COOLDOWN_MS = 35_000;  // don't spam
+
+    private readonly ALERT_MIN_MS = 18_000;            // random alert window
+    private readonly ALERT_MAX_MS = 35_000;
+    private readonly RANDOM_ALERT_CHANCE = 0.55;       // chance per roll
+    private readonly RANDOM_ALERT_COOLDOWN_MS = 25_000;
+
+    private randomAlertTimer?: Phaser.Time.TimerEvent;
 
   // =========================
   // Mentor guide
@@ -130,6 +154,12 @@ export default class HackathonScene extends Phaser.Scene {
 
     // Load the audio
     this.load.audio("bgm", "/assets/audio/hackathon-audio.wav");
+
+    // FOR TESTING
+    this.load.spritesheet("npc-exclaim", "/assets/sprites/exclaim_alert.png", {
+        frameWidth: 16,
+        frameHeight: 16
+    });
   }
 
   // =========================
@@ -162,6 +192,9 @@ export default class HackathonScene extends Phaser.Scene {
     this.textures.get("npc5").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("mentor").setFilter(Phaser.Textures.FilterMode.NEAREST);
 
+    // FOR TESTING
+    this.textures.get("npc-exclaim").setFilter(Phaser.Textures.FilterMode.NEAREST);
+
     // Input
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.keyE = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
@@ -186,6 +219,19 @@ export default class HackathonScene extends Phaser.Scene {
     this.createPlayerAnims();
     this.createNpcAnims();
     this.createMentorAnims();
+
+    this.textures
+      .get("npc-exclaim")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+
+    if (!this.anims.exists("npc-exclaim-anim")) {
+        this.anims.create({
+          key: "npc-exclaim-anim",
+          frames: this.anims.generateFrameNumbers("npc-exclaim", { start: 0, end: 3 }),
+          frameRate: 10,
+          repeat: -1,
+        });
+      }
 
     // =========================
     // Music
@@ -265,6 +311,28 @@ export default class HackathonScene extends Phaser.Scene {
       { sprite: this.spawnNpc(1350, 730, "npc5"), game: "multipleChoice" },
     ];
 
+    // FOR TESTING
+    for (const npc of this.npcs) {
+        const icon = this.add
+          .sprite(npc.x, npc.y, "npc-exclaim", 0)
+          .setOrigin(0.5, 1)
+          .setDepth(999)
+          .setVisible(false);
+      
+        // Scale icon to match your world (NPCs are scale 6)
+        const SCALE_FACTOR = npc.scaleX * 0.75; // tweak: 0.6–1.0
+        icon.setDisplaySize(10 * SCALE_FACTOR, 10 * SCALE_FACTOR);
+      
+        icon.play("npc-exclaim-anim");
+      
+        const HEAD_OFFSET = 6 * npc.scaleY;
+        const GAP = 8 * npc.scaleY;
+      
+        icon.setPosition(npc.x, npc.y - HEAD_OFFSET - GAP);
+      
+        this.npcAlertIcon.set(npc, icon);
+    }
+
     // Tiny collision boxes near NPC feet
     addSolidRect(250, 245, 10, 10);
     addSolidRect(800, 545, 10, 10);
@@ -332,8 +400,22 @@ export default class HackathonScene extends Phaser.Scene {
 
     this.mentorGuide.show({
       message:
-        "Welcome to OVERHACKED!\n\nTalk to judges to play coding minigames. Fill the progress bar before time runs out!",
+        "Welcome to OVERHACKED!\n\nTalk to teammates to help them with their coding problems. Fill the progress bar before time runs out!",
       durationMs: 20000,
+    });
+
+    // FOR TESTING
+    this.lastActiveAt = Date.now();
+
+    // Start random alerts AFTER the intro finishes
+    this.time.delayedCall(20_000, () => {
+        this.scheduleRandomNpcAlerts();
+
+        this.time.addEvent({
+            delay: 1000,
+            loop: true,
+            callback: () => this.tryIdleNudge(),
+          });
     });
 
     this.events.on("mcq-answered", (correct: boolean) => {
@@ -403,6 +485,11 @@ export default class HackathonScene extends Phaser.Scene {
       vy *= inv;
     }
 
+    // ✅ Mark activity if player is actually moving
+    if (vx !== 0 || vy !== 0) {
+        this.markActive();
+    }
+
     this.player.setVelocity(vx * speed, vy * speed);
 
     // -------------------------
@@ -430,6 +517,23 @@ export default class HackathonScene extends Phaser.Scene {
     // NPC interaction
     // -------------------------
     this.updateNpcInteraction();
+
+    // -------------------------
+    // NPC alert markers
+    // -------------------------
+    for (const npc of this.npcs) {
+        const icon = this.npcAlertIcon.get(npc);
+        if (!icon) continue;
+  
+    icon.setPosition(npc.x, npc.y - 160);
+    }
+
+    // Keep markers positioned above NPC heads
+    for (const npc of this.npcs) {
+        const icon = this.npcAlertIcon.get(npc);
+        if (!icon) continue;
+        icon.setPosition(npc.x, npc.y - 160);
+    }
   }
 
   // =========================
@@ -521,6 +625,106 @@ export default class HackathonScene extends Phaser.Scene {
 
       this.dialog.show(this.nearNpc.game);
   }
+
+  // Helper for creating randomized alerts - FOR TESTING
+  private markActive() {
+    this.lastActiveAt = Date.now();
+  }
+  
+  private scheduleRandomNpcAlerts() {
+    const delay = Phaser.Math.Between(this.ALERT_MIN_MS, this.ALERT_MAX_MS);
+  
+    this.randomAlertTimer = this.time.delayedCall(delay, () => {
+      this.tryRandomNpcAlert();
+      this.scheduleRandomNpcAlerts(); // loop forever
+    });
+  }
+  
+  // FOR TESTING - Set up the NPC marker animation   
+  private setNpcMarker(npc: Phaser.GameObjects.Sprite) {
+    // Hide previous marker
+    if (this.alertedNpc) {
+      this.npcAlertIcon.get(this.alertedNpc)?.setVisible(false);
+    }
+  
+    // Stop previous tween
+    this.npcIconTween?.stop();
+    this.npcIconTween = undefined;
+  
+    // Show new marker
+    this.alertedNpc = npc;
+    const icon = this.npcAlertIcon.get(npc);
+    if (!icon) return;
+  
+    icon.setVisible(true);
+  
+    this.npcIconTween = this.tweens.add({
+      targets: icon,
+      y: icon.y - 8,
+      duration: 220,
+      yoyo: true,
+      repeat: -1,
+    });
+  }
+
+  private canInterruptPlayer(): boolean {
+    // keep it polite — don't pop alerts over modal/dialog states
+    if (this.dialog?.isOpen()) return false;
+    if (this.loadingDialog) return false;
+    if (this.winDialog) return false;
+    if (this.gameOver) return false;
+    return true;
+  }
+  
+  private pickRandomNpc(): Phaser.GameObjects.Sprite | null {
+    if (!this.npcs.length) return null;
+    const i = Phaser.Math.Between(0, this.npcs.length - 1);
+    return this.npcs[i];
+  }
+  
+  private tryRandomNpcAlert() {
+    const now = Date.now();
+    if (!this.canInterruptPlayer()) return;
+    if (now - this.lastRandomAlertAt < this.RANDOM_ALERT_COOLDOWN_MS) return;
+    if (Math.random() > this.RANDOM_ALERT_CHANCE) return;
+  
+    const npc = this.pickRandomNpc();
+    if (!npc) return;
+  
+    this.lastRandomAlertAt = now;
+  
+    // Optional: visually ping the NPC (tiny + cheap)
+    this.tweens.add({
+      targets: npc,
+      y: npc.y - 10,
+      duration: 140,
+      yoyo: true,
+      repeat: 2,
+    });
+
+    this.setNpcMarker(npc);
+  
+    this.mentorGuide.show({
+      message: "⚠️ Teammate alert!\nSomeone has a blocker — go talk to them (Press E).",
+      durationMs: 6000,
+    });
+  }
+  
+  private tryIdleNudge() {
+    const now = Date.now();
+    if (!this.canInterruptPlayer()) return;
+  
+    const idleFor = now - this.lastActiveAt;
+    if (idleFor < this.IDLE_THRESHOLD_MS) return;
+    if (now - this.lastIdleNudgeAt < this.IDLE_NUDGE_COOLDOWN_MS) return;
+  
+    this.lastIdleNudgeAt = now;
+  
+    this.mentorGuide.show({
+      message: "😮‍💨 Stuck?\nTry helping another person for a quick win.",
+      durationMs: 5000,
+    });
+  }   
 
   // =========================
   // Animations
