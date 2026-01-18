@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import useUserStore from "../stores/useUserStore";
 
 interface PopupFormProps {
   onClose: () => void;
@@ -9,19 +10,15 @@ interface PopupFormProps {
 
 interface PopupFormData {
   name: string;
-  yearsOfExperience: number
+  yearsOfExperience: number;
   favouriteLanguage: string;
-}
-
-interface yearsOfExperienceOption {
-  value: number
-  label: number
 }
 
 export default function PopupForm({ onClose }: PopupFormProps) {
   const router = useRouter();
+  const setUser = useUserStore((state) => state.setUser); // Zustand setter
 
-    const [formData, setFormData] = useState<PopupFormData>({
+  const [formData, setFormData] = useState<PopupFormData>({
     name: "",
     yearsOfExperience: 1,
     favouriteLanguage: "",
@@ -29,12 +26,19 @@ export default function PopupForm({ onClose }: PopupFormProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Convert yearsOfExperience to number
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "yearsOfExperience" ? Number(value) : value,
+    }));
   };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    console.log("Hackathon entry:", formData);
+    // Update Zustand store
+    setUser(formData);
+
     onClose();
     router.push("/hackathon");
   };
@@ -58,9 +62,11 @@ export default function PopupForm({ onClose }: PopupFormProps) {
           </div>
 
           <div className="flex flex-col">
-            <label className="text-black text-sm mb-1">Years of Experience</label>
+            <label className="text-black text-sm mb-1">
+              Years of Experience
+            </label>
             <input
-              type="text"
+              type="number"
               name="yearsOfExperience"
               value={formData.yearsOfExperience}
               onChange={handleChange}
@@ -71,7 +77,9 @@ export default function PopupForm({ onClose }: PopupFormProps) {
           </div>
 
           <div className="flex flex-col">
-            <label className="text-black text-sm mb-1">Favourite Language</label>
+            <label className="text-black text-sm mb-1">
+              Favourite Language
+            </label>
             <input
               type="text"
               name="favouriteLanguage"
