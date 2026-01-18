@@ -14,6 +14,8 @@ export default class DragAndDropContents {
   }[] = [];
 
   private onAnswer?: (isCorrect: boolean) => void;
+  private destArea?: Phaser.GameObjects.Rectangle;
+
 
   constructor(
     scene: Phaser.Scene,
@@ -95,7 +97,7 @@ export default class DragAndDropContents {
     const areaH = 600;
 
     // Destination area
-    const destArea = s.add
+    this.destArea = s.add
       .rectangle(destX, destY, areaW, areaH, 0x000000, 0.08)
       .setOrigin(0, 0);
 
@@ -107,9 +109,9 @@ export default class DragAndDropContents {
       })
       .setOrigin(0, 0);
 
-    this.root.add(destArea);
+    this.root.add(this.destArea);
     this.root.add(destLabel);
-    this.objects.push(destArea, destLabel);
+    this.objects.push(this.destArea, destLabel);
 
     // -------------------------
     // SUBMIT BUTTON
@@ -223,33 +225,6 @@ export default class DragAndDropContents {
     return sorted;
   }
 
-  // private submit() {
-  //   const finalOrder = this.getFinalOrder();
-  //   console.log("Submitted order:", finalOrder);
-  //   const { data } = useCodingQuizStore.getState();
-  //   console.log("Correct answer:", data?.answer);
-  //   if (!data) {
-  //     this.onAnswer?.(false)
-  //     console.log("No quiz data available");
-  //     return;
-  //   }
-
-  //   if (finalOrder.length === 0) {
-  //     console.log("No cards in drop zone!");
-  //   } else if (finalOrder.length < this.cardData.length) {
-  //     console.log("Not all cards placed!");
-  //   } else {
-  //     const isCorrect = this.isCorrectOrder(finalOrder, data.answer);
-  //     this.onAnswer?.(isCorrect);
-  //     console.log("All cards submitted!");
-  //     if (isCorrect) {
-  //       console.log("Correct order!");
-  //     } else {
-  //       console.log("Incorrect order.");
-  //     }
-  //   }
-  // }
-
   private submit() {
   const finalOrder = this.getFinalOrder();
   const { data } = useCodingQuizStore.getState();
@@ -265,6 +240,12 @@ export default class DragAndDropContents {
   }
 
   const isCorrect = this.isCorrectOrder(finalOrder, data.answer);
+
+    // Flash green or red
+  if (this.destArea) {
+    const color = isCorrect ? 0x4ade80 : 0xf87171; // green : red
+    this.destArea.setFillStyle(color, 0.4);
+  }
   
   // Emit the event for HackathonScene to catch
   this.scene.events.emit("dnd-answered", isCorrect);
@@ -291,5 +272,6 @@ export default class DragAndDropContents {
     this.objects.forEach((obj) => obj.destroy());
     this.objects = [];
     this.cardData = [];
+    this.destArea = undefined;
   }
 }
