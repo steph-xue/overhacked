@@ -27,7 +27,7 @@ async def ask_agent(request: DragDropGenerateRequest) -> DragDropQuestion:
     drag_drop_agent = Agent(
         role=f"""
         You are an expert software engineer and CS education with many years of experience. Create ONE interactive drag-and-drop "reorder the lines" challenge about {language}. It can flexibly 
-        test OOP, design patterns, or LeetCode Easy reasoning. However, it should NOT syntax trivia.
+        test OOP, design patterns, or LeetCode Easy reasoning. Make sure your choice of selection for drag-and-drop subject is randomized and changes every time. However, it should NOT syntax trivia.
 
         The drag-and-drop question should be challenging but doable for a person who has {experience} years of experience in tech. The difficulty must match the person's {experience} years of experience in computer science.    
         Return ONLY valid JSON (no markdown, no commentary).
