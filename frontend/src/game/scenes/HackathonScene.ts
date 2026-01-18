@@ -6,7 +6,7 @@ import { useDragDropStore } from "@/stores/useDragDropStore";
 import ScoreBoard from "@/game/ui/ScoreBoard";
 import GameOverDialog from "@/game/ui/GameOverDialog";
 import MentorGuide from "@/game/ui/MentorGuide";
-import { use } from "react";
+import LoadingDialog from "@/game/ui/LoadingDialog";
 
 import useUserStore from "@/stores/useUserStore";
 
@@ -52,6 +52,7 @@ export default class HackathonScene extends Phaser.Scene {
   // Dialog system
   // =========================
   private dialog!: MiniGameDialog;
+  private loadingDialog?: LoadingDialog;
 
   // =========================
   // Score board
@@ -296,9 +297,9 @@ export default class HackathonScene extends Phaser.Scene {
     this.mentorGuide = new MentorGuide(this);
 
     this.mentorGuide.show({
-    message:
-        "Welcome to OVERHACKED!\n\nTalk to judges to play coding minigames. Fill the progress bar before time runs out!",
-    durationMs: 20000,
+        message:
+            "Welcome to OVERHACKED!\n\nTalk to judges to play coding minigames. Fill the progress bar before time runs out!",
+        durationMs: 20000,
     });
   }
 
@@ -307,8 +308,9 @@ export default class HackathonScene extends Phaser.Scene {
   // =========================
   update() {
     if (!this.dialog) return;
-    // Freeze player while dialog is open
-    if (this.dialog.isOpen()) {
+
+    // Freeze player while ANY overlay is open
+    if (this.dialog.isOpen() || this.loadingDialog) {
       this.player.setVelocity(0, 0);
       return;
     }
@@ -416,27 +418,33 @@ export default class HackathonScene extends Phaser.Scene {
 
       if (Phaser.Input.Keyboard.JustDown(this.keyE)) {
         const { data, loading, error } = useNpcStore.getState();
-        if (loading) {
-          //   this.dialog.show("loading");
-          console.log("NPC data is still loading...");
-          return;
-        }
-
+        
         if (error) {
-          //   this.dialog.show("error", error);
-          console.log("error");
+        console.log("NPC error:", error);
+            return;
+        }
+
+        // If already fetching, just show loading UI
+        if (loading) {
+          this.showLoading();
           return;
         }
 
-        if (data) {
-          this.dialog.show("multipleChoice");
+        // If we don't have data yet, fetch it (and show loading immediately)
+        if (!data) {
+            void this.openNpcMinigame(); // open loading -> await fetch -> swap to multipleChoice
+            return;
         }
+
+        this.dialog.show("multipleChoice");
       }
       else if( Phaser.Input.Keyboard.JustDown(this.keyD)) {
         this.dialog.show("dragAndDrop");
       }
     } else {
       this.talkPrompt.setVisible(false);
+      this.hideLoading();
+      
     }
   }
 
@@ -491,6 +499,43 @@ export default class HackathonScene extends Phaser.Scene {
       repeat: -1, // loop forever
     });
   }
+
+  private async openNpcMinigame() {
+    // show loading instantly
+    this.showLoading();
+
+    // ensure data fetch starts (if your store already fetches once at create, this is still safe)
+    const npcStore = useNpcStore.getState();
+
+    // If you have a promise-returning fetch, await it.
+    // If fetchNpcData does NOT return a promise, make it return the fetch() promise in the store.
+    try {
+        await npcStore.fetchNpcData(); // <-- make sure this returns Promise<void>
+
+        // close loading, open real dialog
+        this.hideLoading();
+        this.dialog.show("multipleChoice");
+    } catch (e) {
+        console.error(e);
+        // optional: show an error content type if you have one
+        // this.dialog.show("error");
+        this.hideLoading();
+        this.dialog.hide(); // simplest fallback
+    }
+  }
+
+    private showLoading() {
+        if (this.loadingDialog) return;
+        this.loadingDialog = new LoadingDialog(this);
+    }
+
+
+    private hideLoading() {
+        this.loadingDialog?.destroy();
+        this.loadingDialog = undefined;
+    }
+
+
 
   // =========================
   // Background scaling

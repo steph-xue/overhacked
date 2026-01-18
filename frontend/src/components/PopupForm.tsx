@@ -45,24 +45,24 @@ export default function PopupForm({ onClose }: PopupFormProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white text-black rounded-2xl shadow-lg max-w-md w-full p-6 space-y-4 overflow-auto">
+      <div className="bg-white text-[#4A3F35] rounded-2xl shadow-lg max-w-md w-full p-6 space-y-4 overflow-auto">
         <h2 className="text-xl font-semibold mb-4">Hackathon Entry</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col">
-            <label className="text-black text-sm mb-1">Name</label>
+            <label className="text-[#4A3F35] text-sm mb-1">Name</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="border rounded-lg p-2 w-full text-black"
+              className="border rounded-lg p-2 w-full text-[#4A3F35]"
               placeholder="Your Name"
               required
             />
           </div>
 
           <div className="flex flex-col">
-            <label className="text-black text-sm mb-1">
+            <label className="text-[#4A3F35] text-sm mb-1">
               Years of Experience
             </label>
             <input
@@ -70,14 +70,14 @@ export default function PopupForm({ onClose }: PopupFormProps) {
               name="yearsOfExperience"
               value={formData.yearsOfExperience}
               onChange={handleChange}
-              className="border rounded-lg p-2 w-full text-black"
+              className="border rounded-lg p-2 w-full text-[#4A3F35]"
               placeholder="Years"
               required
             />
           </div>
 
           <div className="flex flex-col">
-            <label className="text-black text-sm mb-1">
+            <label className="text-[#4A3F35] text-sm mb-1">
               Favourite Language
             </label>
             <input
@@ -85,7 +85,7 @@ export default function PopupForm({ onClose }: PopupFormProps) {
               name="favouriteLanguage"
               value={formData.favouriteLanguage}
               onChange={handleChange}
-              className="border rounded-lg p-2 w-full text-black"
+              className="border rounded-lg p-2 w-full text-[#4A3F35]"
               placeholder="Language"
               required
             />
@@ -101,7 +101,7 @@ export default function PopupForm({ onClose }: PopupFormProps) {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-lg bg-black text-white"
+              className="px-4 py-2 rounded-lg bg-[#4A3F35] text-white"
             >
               Submit
             </button>
