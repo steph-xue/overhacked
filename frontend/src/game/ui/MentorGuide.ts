@@ -51,13 +51,21 @@ export default class MentorGuide {
     // -------------------------
     // Message text
     // -------------------------
+    const textMaxW = W - (PAD + 130) - PAD;
+
     const text = s.add.text(PAD + 110, PAD + 10, args.message, {
-      fontFamily: "Silkscreen",
-      fontSize: "18px",
-      color: "#4A3F35",
-      wordWrap: { width: W - (PAD + 90) - PAD },
-      lineSpacing: 6,
+        fontFamily: "Silkscreen",
+        fontSize: "18px",
+        color: "#4A3F35",
+        lineSpacing: 6,
+        wordWrap: {
+            width: textMaxW,
+            useAdvancedWrap: true, 
+        },
     });
+
+    text.setFixedSize(textMaxW, H - PAD * 2);
+    text.setAlign("left");
 
     // -------------------------
     // Click-to-dismiss hit area
