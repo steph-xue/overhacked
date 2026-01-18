@@ -5,6 +5,7 @@ import { useCodingQuizStore } from "@/stores/useCodingQuizStore";
 import { useDragDropStore } from "@/stores/useDragDropStore";
 import ScoreBoard from "@/game/ui/ScoreBoard";
 import GameOverDialog from "@/game/ui/GameOverDialog";
+import MentorGuide from "@/game/ui/MentorGuide";
 import { use } from "react";
 
 import useUserStore from "@/stores/useUserStore";
@@ -61,6 +62,11 @@ export default class HackathonScene extends Phaser.Scene {
   // Game over
   // =========================
   private gameOver?: GameOverDialog;
+
+  // =========================
+  // Mentor guide
+  // =========================
+  private mentorGuide!: MentorGuide;
 
   // Track last facing direction (future-proofing for directional idle)
   private lastDir: "down" | "left" | "right" | "up" = "down";
@@ -282,8 +288,18 @@ export default class HackathonScene extends Phaser.Scene {
     // Start timer + progress
     this.scoreBoard.start(180); // 3 minutes
     this.scoreBoard.setProgress(0.5);
+
     // Drag-and-Drop
     useDragDropStore.getState().fetchDragDropData();
+
+    // Mentor guide at beginning of game
+    this.mentorGuide = new MentorGuide(this);
+
+    this.mentorGuide.show({
+    message:
+        "Welcome to OVERHACKED!\n\nTalk to judges to play coding minigames. Fill the progress bar before time runs out!",
+    durationMs: 20000,
+    });
   }
 
   // =========================
