@@ -13,14 +13,20 @@ export default class DragAndDropContents {
     inDropZone: boolean;
   }[] = [];
 
+  private onAnswer?: (isCorrect: boolean) => void;
+  private destArea?: Phaser.GameObjects.Rectangle;
+
+
   constructor(
     scene: Phaser.Scene,
     root: Phaser.GameObjects.Container,
-    contentW: number
+    contentW: number,
+    onAnswer?: (isCorrect: boolean) => void
   ) {
     this.scene = scene;
     this.root = root;
     this.contentW = contentW;
+    this.onAnswer = onAnswer;
   }
 
   mount() {
@@ -51,6 +57,7 @@ export default class DragAndDropContents {
     }
 
     const { question, answer } = data;
+    console.log("CORRECT ANSWER:", answer);
 
     // -------------------------
     // TITLE
@@ -90,7 +97,7 @@ export default class DragAndDropContents {
     const areaH = 600;
 
     // Destination area
-    const destArea = s.add
+    this.destArea = s.add
       .rectangle(destX, destY, areaW, areaH, 0x000000, 0.08)
       .setOrigin(0, 0);
 
@@ -102,9 +109,9 @@ export default class DragAndDropContents {
       })
       .setOrigin(0, 0);
 
-    this.root.add(destArea);
+    this.root.add(this.destArea);
     this.root.add(destLabel);
-    this.objects.push(destArea, destLabel);
+    this.objects.push(this.destArea, destLabel);
 
     // -------------------------
     // SUBMIT BUTTON
@@ -176,7 +183,7 @@ export default class DragAndDropContents {
       const cardInfo = { label: card.label, rect, inDropZone: false };
       this.cardData.push(cardInfo);
 
-      rect.on("drag", (_pointer, dragX, dragY) => {
+      rect.on("drag", (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
         rect.x = dragX;
         rect.y = dragY;
 
@@ -219,28 +226,32 @@ export default class DragAndDropContents {
   }
 
   private submit() {
-    const finalOrder = this.getFinalOrder();
-    console.log("Submitted order:", finalOrder);
-    const { data } = useCodingQuizStore.getState();
-    if (!data) {
-      console.log("No quiz data available");
-      return;
-    }
-
-    if (finalOrder.length === 0) {
-      console.log("No cards in drop zone!");
-    } else if (finalOrder.length < this.cardData.length) {
-      console.log("Not all cards placed!");
-    } else {
-      const isCorrect = this.isCorrectOrder(finalOrder, data.answer);
-      console.log("All cards submitted!");
-      if (isCorrect) {
-        console.log("Correct order!");
-      } else {
-        console.log("Incorrect order.");
-      }
-    }
+  const finalOrder = this.getFinalOrder();
+  const { data } = useCodingQuizStore.getState();
+  
+  if (!data) {
+    this.onAnswer?.(false);
+    return;
   }
+
+  if (finalOrder.length !== this.cardData.length) {
+    console.log(`Only ${finalOrder.length}/${this.cardData.length} cards placed`);
+    return;
+  }
+
+  const isCorrect = this.isCorrectOrder(finalOrder, data.answer);
+
+    // Flash green or red
+  if (this.destArea) {
+    const color = isCorrect ? 0x4ade80 : 0xf87171; // green : red
+    this.destArea.setFillStyle(color, 0.4);
+  }
+  
+  // Emit the event for HackathonScene to catch
+  this.scene.events.emit("dnd-answered", isCorrect);
+  
+  this.onAnswer?.(isCorrect);
+}
 
   private shuffleArray<T>(array: T[]): T[] {
     const shuffled = [...array];
@@ -261,5 +272,6 @@ export default class DragAndDropContents {
     this.objects.forEach((obj) => obj.destroy());
     this.objects = [];
     this.cardData = [];
+    this.destArea = undefined;
   }
 }
