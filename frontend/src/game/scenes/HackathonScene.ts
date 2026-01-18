@@ -1,5 +1,7 @@
 import * as Phaser from "phaser";
 import MiniGameDialog from "@/game/ui/MiniGameDialog";
+import ScoreBoard from "@/game/ui/ScoreBoard"; 
+import GameOverDialog from "@/game/ui/GameOverDialog";  
 
 /**
  * HackathonScene
@@ -40,6 +42,16 @@ export default class HackathonScene extends Phaser.Scene {
   // =========================
   private dialog!: MiniGameDialog;
 
+  // =========================
+  // Score board
+  // =========================
+  private scoreBoard!: ScoreBoard;
+
+  // =========================
+  // Game over
+  // =========================
+  private gameOver?: GameOverDialog;
+
   // Track last facing direction (future-proofing for directional idle)
   private lastDir: "down" | "left" | "right" | "up" = "down";
 
@@ -58,6 +70,8 @@ export default class HackathonScene extends Phaser.Scene {
     this.load.spritesheet("npc1", "/assets/sprites/npc1.png", { frameWidth: 24, frameHeight: 24 });
     this.load.spritesheet("npc2", "/assets/sprites/npc2.png", { frameWidth: 24, frameHeight: 24 });
     this.load.spritesheet("npc3", "/assets/sprites/npc3.png", { frameWidth: 24, frameHeight: 24 });
+    this.load.spritesheet("npc4", "/assets/sprites/npc4.png", { frameWidth: 24, frameHeight: 24 });
+    this.load.spritesheet("npc5", "/assets/sprites/npc5.png", { frameWidth: 24, frameHeight: 24 });
 
     this.load.spritesheet("mentor", "/assets/sprites/mentor.png", { frameWidth: 24, frameHeight: 24 });
 
@@ -72,6 +86,8 @@ export default class HackathonScene extends Phaser.Scene {
     this.textures.get("npc1").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("npc2").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("npc3").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("npc4").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("npc5").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("mentor").setFilter(Phaser.Textures.FilterMode.NEAREST);
 
     // Input
@@ -157,14 +173,18 @@ export default class HackathonScene extends Phaser.Scene {
     // =========================
     const npc1 = this.spawnNpc(250, 300, "npc1");
     const npc2 = this.spawnNpc(800, 600, "npc2");
-    const npc3 = this.spawnNpc(1300, 400, "npc3");
+    const npc3 = this.spawnNpc(1250, 300, "npc3");
+    const npc4 = this.spawnNpc(200, 800, "npc4");
+    const npc5 = this.spawnNpc(1350, 730, "npc5");
 
-    this.npcs = [npc1, npc2, npc3];
+    this.npcs = [npc1, npc2, npc3, npc4, npc5];
 
     // Tiny collision boxes near NPC feet
     addSolidRect(250, 245, 10, 10);
     addSolidRect(800, 545, 10, 10);
-    addSolidRect(1300, 345, 10, 10);
+    addSolidRect(1250, 245, 10, 10);
+    addSolidRect(200, 745, 10, 10);
+    addSolidRect(1350, 675, 10, 10);
 
     // =========================
     // Talk prompt
@@ -187,6 +207,39 @@ export default class HackathonScene extends Phaser.Scene {
     // Dialog system
     // =========================
     this.dialog = new MiniGameDialog(this, { bgHex: "#F3E9D9" });
+
+    // =========================
+    // Scoreboard + game over
+    // =========================
+    this.scoreBoard = new ScoreBoard(this);
+    this.scoreBoard.mount({
+    onTimeUp: () => {
+        // guard so it only opens once
+        if (this.gameOver) return;
+
+        this.gameOver = new GameOverDialog(this);
+        this.gameOver.mount({
+        onRestart: () => {
+            this.gameOver?.unmount();
+            this.gameOver = undefined;
+
+            // optional: re-enable input if you disabled it
+            // this.input.keyboard!.enabled = true;
+
+            this.scene.restart();
+        },
+        onQuit: () => {
+            this.gameOver?.unmount();
+            this.gameOver = undefined;
+            window.location.href = "/";  // redirect to homepage
+        },
+        });
+    },
+    });
+
+    this.scoreBoard.start(60);     
+    this.scoreBoard.setProgress(0.5);
+
   }
 
   // =========================
@@ -313,7 +366,7 @@ export default class HackathonScene extends Phaser.Scene {
   }
 
   private createNpcAnims() {
-    ["npc1", "npc2", "npc3"].forEach((key) => {
+    ["npc1", "npc2", "npc3", "npc4", "npc5"].forEach((key) => {
       this.anims.create({
         key: `${key}-idle`,
         frames: this.anims.generateFrameNumbers(key, { start: 0, end: 7 }),
@@ -348,5 +401,10 @@ export default class HackathonScene extends Phaser.Scene {
 
     this.bg.setPosition(w / 2, h / 2);
     this.bg.setScale(Math.min(w / img.width, h / img.height));
+  }
+
+  shutdown() {
+    this.scoreBoard?.unmount();
+    this.gameOver?.unmount();
   }
 }
