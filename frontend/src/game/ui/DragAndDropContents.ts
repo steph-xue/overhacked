@@ -15,6 +15,7 @@ export default class DragAndDropContents {
 
   private onAnswer?: (isCorrect: boolean) => void;
   private destArea?: Phaser.GameObjects.Rectangle;
+  private answered = false;
 
 
   constructor(
@@ -226,26 +227,31 @@ export default class DragAndDropContents {
   }
 
   private submit() {
-  const finalOrder = this.getFinalOrder();
-  const { data } = useCodingQuizStore.getState();
-  
-  if (!data) {
-    this.onAnswer?.(false);
-    return;
-  }
+    if (this.answered) return;
+    const finalOrder = this.getFinalOrder();
+    const { data } = useCodingQuizStore.getState();
+    
+    if (!data) {
+      this.onAnswer?.(false);
+      return;
+    }
 
-  if (finalOrder.length !== this.cardData.length) {
-    console.log(`Only ${finalOrder.length}/${this.cardData.length} cards placed`);
-    return;
-  }
+    if (finalOrder.length !== this.cardData.length) {
+      console.log(`Only ${finalOrder.length}/${this.cardData.length} cards placed`);
+      return;
+    }
 
-  const isCorrect = this.isCorrectOrder(finalOrder, data.answer);
+    const isCorrect = this.isCorrectOrder(finalOrder, data.answer);
 
-    // Flash green or red
-  if (this.destArea) {
-    const color = isCorrect ? 0x4ade80 : 0xf87171; // green : red
-    this.destArea.setFillStyle(color, 0.4);
-  }
+    if (isCorrect) {
+      this.answered = true;
+    }
+
+      // Flash green or red
+    if (this.destArea) {
+      const color = isCorrect ? 0x4ade80 : 0xf87171; // green : red
+      this.destArea.setFillStyle(color, 0.4);
+    }
   
   // Emit the event for HackathonScene to catch
   this.scene.events.emit("dnd-answered", isCorrect);
@@ -273,5 +279,6 @@ export default class DragAndDropContents {
     this.objects = [];
     this.cardData = [];
     this.destArea = undefined;
+    this.answered = false;
   }
 }
