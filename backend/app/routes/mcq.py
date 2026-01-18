@@ -38,7 +38,7 @@ async def ask_agent(request: MCQRequest) -> MCQResponse:
         expected_output="""
         {
             "question": string,
-            "choices": string[],
+            "choices": string[], # Each choice should be less than 40 letters
             "answer": number
         }
         """,
@@ -55,7 +55,7 @@ async def ask_agent(request: MCQRequest) -> MCQResponse:
         description=f"Provide a series of hints to help {username} understand the concepts behind the quiz question. Start with lighter, more general hints, and gradually give more detailed or specific hints in later steps. Each hint should build on the previous ones and guide the user toward understanding without giving away the answer directly.",
         expected_output="""
         {
-            "hints": string[]
+            "hints": ["hint 1", "hint 2", "hint 3"] # length should be always 3 # Each hint should be less than 100 letters
         }
         """,
         agent=multiple_quiz_hints_agent,

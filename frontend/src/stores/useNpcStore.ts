@@ -5,6 +5,7 @@ type MCQResponse = {
   question: string;
   choices: string[];
   answer: number;
+  hints: string[];
 };
 
 type NpcStore = {
