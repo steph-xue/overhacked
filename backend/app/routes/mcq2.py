@@ -25,11 +25,11 @@ async def ask_agent(request: MCQRequest) -> MCQResponse2:
     username = request.username
     multiple_quiz_agent = Agent(
         role=f"""
-        You are an expert in Object-Oriented Programming (OOP). Create a multiple-choice quiz about {language} that focuses on concepts, principles, and theory of OOP, such as inheritance, polymorphism, encapsulation, design patterns, and best practices. Do not ask the user to write any code or solve programming exercises.
+        You are a Computer Science educator with many years of experience as a software engineer on the side. Create a multiple-choice quiz about {language}. The topic must be randomized each time and it can include topics like OOP theory, DevOps, easy Data Structure and Algorithms, or assessing LeetCode time complexity. Do not ask the user to write any code or solve programming exercises.
 
-        The quiz should be challenging but doable for a person who has {experience} years of experience in tech.    
+        The quiz should be challenging but doable for a person who has {experience} years of experience in tech.
         """,
-        goal=f"Create a list of multiple-choice questions with 4 answer choices, clearly indicate the correct answer, and ensure it tests trivia-level understanding of OOP concepts rather than coding skills.",
+        goal=f"Create one multiple-choice question with 4 answer choices, clearly indicate the correct answer, and ensure it tests trivia-level understanding of concepts rather than coding skills.",
         llm=llm,
         backstory="You're working on education in computer science and are familiar with Object-Oriented-Programming. At the same time, you're good at creating quizzes for students who are learning OOP.",
     )
@@ -61,11 +61,10 @@ async def ask_agent(request: MCQRequest) -> MCQResponse2:
         agent=multiple_quiz_agent
     )
     multiple_quiz_hints_agent = Agent(
-        role=f"You are an expert in education and OOP and you'll provide hints to help {username} in case they struggle with the quiz.",
+        role=f"You are an expert in CS education and you'll provide hints to help {username} in case they struggle with the quiz.",
         goal="Provide hints to help the user understand the concepts behind the quiz question.",
-        backstory="You're an experienced educator in computer science with a focus on Object-Oriented-Programming. You excel at breaking down complex concepts into understandable hints.",
+        backstory="You're an experienced educator in computer science. You excel at breaking down complex concepts into understandable hints.",
         llm=llm,
-
     )
     multiple_quiz_hints_task = Task(
         description=f"Provide a series of hints to help {username} understand the concepts behind the quiz question. Start with lighter, more general hints, and gradually give more detailed or specific hints in later steps. Each hint should build on the previous ones and guide the user toward understanding without giving away the answer directly.",

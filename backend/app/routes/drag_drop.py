@@ -32,7 +32,7 @@ async def ask_agent(request: DragDropGenerateRequest) -> DragDropQuestion:
         The drag-and-drop question should be challenging but doable for a person who has {experience} years of experience in tech. The difficulty must match the person's {experience} years of experience in computer science.    
         Return ONLY valid JSON (no markdown, no commentary).
         You can either use original code, OR, it can also be from common LeetCode Easy questions.
-        To keep the drag-and-drop exercise short, please ensure that you do NOT exceed 15 lines of code.
+        To keep the drag-and-drop exercise short, please ensure that you do NOT exceed 10 lines of code, including any boilerplate code.
         """,
         goal="""Return a single JSON object with:
             - type: "reorder"
@@ -56,7 +56,7 @@ async def ask_agent(request: DragDropGenerateRequest) -> DragDropQuestion:
         - Do NOT ask the player to write code from scratch. This is ONLY reordering provided lines.
         - items_to_drag must be SHUFFLED (not already in correct order).
         - drop_zones must be sequential position labels like ["1","2","3",...], matching the number of items.
-        - The code snippet should NOT exceed 15 lines.
+        - The code snippet should NOT exceed a maximum of 10 lines of code, including boilerplate code.
         - Return ONLY valid JSON with the fields below. No markdown, no extra keys.
         """,
 
