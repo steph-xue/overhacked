@@ -91,13 +91,13 @@ export default class HackathonScene extends Phaser.Scene {
     private lastRandomAlertAt = 0;
 
     // tune these
-    private readonly IDLE_THRESHOLD_MS = 45_000;       // idle for 45s
-    private readonly IDLE_NUDGE_COOLDOWN_MS = 35_000;  // don't spam
+    private readonly IDLE_THRESHOLD_MS = 15_000;       // idle for 15s
+    private readonly IDLE_NUDGE_COOLDOWN_MS = 15_000;  // don't spam
 
-    private readonly ALERT_MIN_MS = 18_000;            // random alert window
+    private readonly ALERT_MIN_MS = 5_000;            // random alert window
     private readonly ALERT_MAX_MS = 35_000;
-    private readonly RANDOM_ALERT_CHANCE = 0.55;       // chance per roll
-    private readonly RANDOM_ALERT_COOLDOWN_MS = 25_000;
+    private readonly RANDOM_ALERT_CHANCE = 0.80;       // chance per roll
+    private readonly RANDOM_ALERT_COOLDOWN_MS = 20_000;
 
     private randomAlertTimer?: Phaser.Time.TimerEvent;
 
@@ -423,48 +423,43 @@ export default class HackathonScene extends Phaser.Scene {
 
     // Add progress for multiple choice answers
     this.events.on("mcq-answered", (correct: boolean) => {
-        if (!correct) return;
-
-        this.addProgress(this.MCQ_PROGRESS);
+      if (!correct) return;
+      this.addProgress(this.MCQ_PROGRESS);
     });
 
     // Add progress for drag and drop answers
-    this.events.off("dnd-answered");
     this.events.on("dnd-answered", (correct: boolean) => {
-        if (!correct) return;
-
-        this.addProgress(this.DND_PROGRESS);
+      if (!correct) return;
+      this.addProgress(this.DND_PROGRESS);
     });
+
+    this.scoreBoard.setProgress(this.progress);
   }
 
-    // Add progress and check for win condition
-    private addProgress(delta: number) {
-        if (this.hasWon) return;
+  private addProgress(delta: number) {
+    if (this.hasWon) return;
 
     this.progress = Phaser.Math.Clamp(this.progress + delta, 0, 1);
     this.scoreBoard.setProgress(this.progress);
 
-    if (this.progress >= 1) {
-        this.hasWon = true;
+    if (this.progress < 1) return;
 
-        window.dispatchEvent(new CustomEvent("game-win"));
+    this.hasWon = true;
+    window.dispatchEvent(new CustomEvent("game-win"));
 
-        this.winDialog = new WinningDialog(this);
-        this.winDialog.mount({
-        onPlayAgain: () => {
-            this.winDialog?.unmount();
-            this.winDialog = undefined;
-            this.hasWon = false;
-            this.scene.restart();
-        },
-        onQuit: () => {
-            this.winDialog?.unmount();
-            this.winDialog = undefined;
-            this.hasWon = false;
-            window.location.href = "/";
-        },
-        });
-      }
+    this.winDialog = new WinningDialog(this);
+    this.winDialog.mount({
+      onPlayAgain: () => {
+        this.winDialog?.unmount();
+        this.winDialog = undefined;
+        this.scene.restart();
+      },
+      onQuit: () => {
+        this.winDialog?.unmount();
+        this.winDialog = undefined;
+        window.location.href = "/";
+      },
+    });
   }
 
   // =========================
