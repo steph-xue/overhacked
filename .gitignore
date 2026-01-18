@@ -8,10 +8,3 @@ frontend/.next/
 
 # env
 .env*
-
-# Python compiled files
-__pycache__/
-*.py[cod]
-
-# Virtual environment
-venv/

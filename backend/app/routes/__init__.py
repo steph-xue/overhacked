@@ -1,1 +1,0 @@
-from .mcq import mcq_router
