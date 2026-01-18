@@ -15,14 +15,15 @@ class NPCInteractRequest(BaseModel):
     
 # The MC Question response we get back from the NPC after the initial player interaction
 class MCQResponse(BaseModel):
-    question_type: Literal["mcq"]
-    question_text: str
+    question: str
     choices: List[str]
+    answer: int
 
-# The response provided back from the NPC after the player makes their selection for the MCQ
-class MCQ_AnswerResponse(BaseModel):
-    is_correct: bool
-    explanation: Optional[str] = None
+class MCQRequest(BaseModel):
+    # session_id: str??
+    username: str
+    experience: int
+    language: str
 
 # The Drag and Drop Item structure
 class DragDropItem(BaseModel):

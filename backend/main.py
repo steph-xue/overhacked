@@ -1,5 +1,5 @@
 from fastapi import APIRouter, FastAPI
-
+from app.routes import mcq_router
 # Create FastAPI instance
 app = FastAPI()
 router = APIRouter()
@@ -9,3 +9,5 @@ router = APIRouter()
 def root():
     return {"message": "Welcome to the FastAPI backend!"}
 
+# MCQ router
+app.include_router(mcq_router)
