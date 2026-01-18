@@ -1,147 +1,352 @@
 import * as Phaser from "phaser";
+import MiniGameDialog from "@/game/ui/MiniGameDialog";
 
+/**
+ * HackathonScene
+ * ---------------
+ * Main playable scene:
+ * - Player movement (4-directional)
+ * - NPCs with proximity interaction
+ * - Collision with tables / walls / NPCs
+ * - Name tag above player
+ * - "Press E to talk" prompt
+ * - Opens a Dialog with specified content type
+ */
 export default class HackathonScene extends Phaser.Scene {
+  // =========================
+  // Core scene objects
+  // =========================
   private bg!: Phaser.GameObjects.Image;
+
   private player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
-  // Track last facing direction for idle
+  private playerName!: Phaser.GameObjects.Text;
+
+  // =========================
+  // Interaction / UI
+  // =========================
+  private keyE!: Phaser.Input.Keyboard.Key;
+  private talkPrompt!: Phaser.GameObjects.Text;
+
+  // =========================
+  // NPC tracking
+  // =========================
+  private npcs: Phaser.GameObjects.Sprite[] = [];
+  private nearNpc: Phaser.GameObjects.Sprite | null = null;
+
+  // =========================
+  // Dialog system
+  // =========================
+  private dialog!: MiniGameDialog;
+
+  // Track last facing direction (future-proofing for directional idle)
   private lastDir: "down" | "left" | "right" | "up" = "down";
 
   constructor() {
     super("HackathonScene");
   }
 
+  // =========================
+  // Asset loading
+  // =========================
   preload() {
-    // Background
     this.load.image("hackathon-background", "/assets/backgrounds/hackathon-background.png");
 
-    // Player spritesheet (32x32 frames)
-    this.load.spritesheet("player", "/assets/sprites/player.png", {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
+    this.load.spritesheet("player", "/assets/sprites/player.png", {frameWidth: 24, frameHeight: 24,});
+
+    this.load.spritesheet("npc1", "/assets/sprites/npc1.png", { frameWidth: 24, frameHeight: 24 });
+    this.load.spritesheet("npc2", "/assets/sprites/npc2.png", { frameWidth: 24, frameHeight: 24 });
+    this.load.spritesheet("npc3", "/assets/sprites/npc3.png", { frameWidth: 24, frameHeight: 24 });
+
+    this.load.spritesheet("mentor", "/assets/sprites/mentor.png", { frameWidth: 24, frameHeight: 24 });
+
   }
 
+  // =========================
+  // Scene setup
+  // =========================
   create() {
-    // Crisp pixel scaling
+    // Ensure crisp pixel rendering
     this.textures.get("player").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("npc1").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("npc2").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("npc3").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("mentor").setFilter(Phaser.Textures.FilterMode.NEAREST);
 
     // Input
     this.cursors = this.input.keyboard!.createCursorKeys();
+    this.keyE = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
+    // =========================
     // Background
+    // =========================
     const w = this.scale.width;
     const h = this.scale.height;
 
     this.bg = this.add
       .image(w / 2, h / 2, "hackathon-background")
-      .setOrigin(0.5, 0.5)
-      .setScrollFactor(0);
+      .setOrigin(0.5)
+      .setDepth(0);
 
     this.fitBackground();
     this.scale.on("resize", this.fitBackground, this);
 
-    // Animations (assumes 4 columns per row, 8 rows total)
+    // =========================
+    // Animations
+    // =========================
     this.createPlayerAnims();
+    this.createNpcAnims();
+    this.createMentorAnims();
 
-    // Player (start center-bottom-ish)
-    const spawnX = w / 2;
-    const spawnY = h - 130;
-
-    this.player = this.physics.add.sprite(spawnX, spawnY, "player", 0);
-    this.player.setScale(4);
+    // =========================
+    // Player setup
+    // =========================
+    this.player = this.physics.add.sprite(w / 2, h - 130, "player", 0);
+    this.player.setScale(6);
     this.player.setCollideWorldBounds(true);
     this.player.setGravityY(0);
+    this.player.setDepth(1);
+    this.player.anims.play("player-idle", true);
 
-    // Start idle down
-    this.player.anims.play("player-idle-down", true);
+    // Player name tag
+    this.playerName = this.add
+      .text(this.player.x, this.player.y, "Player", {
+        fontFamily: "monospace",
+        fontSize: "22px",
+        color: "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 5,
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(11);
+
+    this.playerName.setResolution(2);
+
+    // =========================
+    // World collisions
+    // =========================
+    const solids = this.physics.add.staticGroup();
+
+    const addSolidRect = (x: number, y: number, w: number, h: number) => {
+      const r = this.add.rectangle(x, y, w, h, 0x00ff00, 0);
+      this.physics.add.existing(r, true);
+      solids.add(r);
+    };
+
+    // Tables
+    addSolidRect(440, 350, 200, 70);
+    addSolidRect(1050, 350, 200, 70);
+    addSolidRect(420, 600, 220, 70);
+    addSolidRect(1100, 600, 220, 70);
+
+    // Walls / planters
+    addSolidRect(0, 0, 3000, 200);
+    addSolidRect(750, 0, 220, 300);
+    addSolidRect(0, 0, 200, 500);
+    addSolidRect(0, 300, 100, 200);
+    addSolidRect(1500, 0, 200, 500);
+    addSolidRect(1500, 300, 100, 200);
+    addSolidRect(0, 970, 700, 200);
+    addSolidRect(1500, 970, 750, 200);
+
+    this.physics.add.collider(this.player, solids);
+
+    // =========================
+    // NPCs
+    // =========================
+    const npc1 = this.spawnNpc(250, 300, "npc1");
+    const npc2 = this.spawnNpc(800, 600, "npc2");
+    const npc3 = this.spawnNpc(1300, 400, "npc3");
+
+    this.npcs = [npc1, npc2, npc3];
+
+    // Tiny collision boxes near NPC feet
+    addSolidRect(250, 245, 10, 10);
+    addSolidRect(800, 545, 10, 10);
+    addSolidRect(1300, 345, 10, 10);
+
+    // =========================
+    // Talk prompt
+    // =========================
+    this.talkPrompt = this.add
+      .text(0, 0, "Press E to talk", {
+        fontFamily: "monospace",
+        fontSize: "22px",
+        color: "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 5,
+      })
+      .setOrigin(0.5, 1)
+      .setVisible(false)
+      .setDepth(999);
+
+    this.talkPrompt.setResolution(2);
+
+    // =========================
+    // Dialog system
+    // =========================
+    this.dialog = new MiniGameDialog(this, { bgHex: "#F3E9D9" });
   }
 
+  // =========================
+  // Frame update
+  // =========================
   update() {
-    const speed = 220;
-
-    const left = !!this.cursors.left?.isDown;
-    const right = !!this.cursors.right?.isDown;
-    const up = !!this.cursors.up?.isDown;
-    const down = !!this.cursors.down?.isDown;
-
-    let vx = 0;
-    let vy = 0;
-
-    if (left) vx = -speed;
-    else if (right) vx = speed;
-
-    if (up) vy = -speed;
-    else if (down) vy = speed;
-
-    this.player.setVelocity(vx, vy);
-
-    // Choose animation based on movement
-    if (vx === 0 && vy === 0) {
-      // idle in last direction
-      this.player.anims.play(`player-idle-${this.lastDir}`, true);
+    // Freeze player while dialog is open
+    if (this.dialog.isOpen()) {
+      this.player.setVelocity(0, 0);
       return;
     }
 
-    // Prefer vertical anim if moving more vertically; otherwise horizontal
-    if (Math.abs(vy) >= Math.abs(vx)) {
-      if (vy < 0) {
-        this.lastDir = "up";
-        this.player.anims.play("player-walk-up", true);
-      } else {
-        this.lastDir = "down";
-        this.player.anims.play("player-walk-down", true);
+    // -------------------------
+    // Movement
+    // -------------------------
+    const speed = 300;
+    let vx = 0;
+    let vy = 0;
+
+    if (this.cursors.left.isDown) vx--;
+    if (this.cursors.right.isDown) vx++;
+    if (this.cursors.up.isDown) vy--;
+    if (this.cursors.down.isDown) vy++;
+
+    // Normalize diagonal movement
+    if (vx !== 0 && vy !== 0) {
+      const inv = 1 / Math.sqrt(2);
+      vx *= inv;
+      vy *= inv;
+    }
+
+    this.player.setVelocity(vx * speed, vy * speed);
+
+    // -------------------------
+    // Animations
+    // -------------------------
+    if (vx < 0) {
+      this.player.setFlipX(true);
+      this.player.anims.play("player-walk-left", true);
+    } else if (vx > 0) {
+      this.player.setFlipX(false);
+      this.player.anims.play("player-walk-right", true);
+    } else if (vy !== 0) {
+      this.player.anims.play("player-walk-right", true);
+    } else {
+      this.player.anims.play("player-idle", true);
+    }
+
+    // -------------------------
+    // Player name positioning
+    // -------------------------
+    const HEAD_OFFSET = 6 * this.player.scaleY;
+    this.playerName.setPosition(this.player.x, this.player.y - HEAD_OFFSET);
+
+    // -------------------------
+    // NPC interaction
+    // -------------------------
+    this.updateNpcInteraction();
+  }
+
+  // =========================
+  // Helpers
+  // =========================
+
+  private spawnNpc(x: number, y: number, key: string) {
+    const npc = this.add.sprite(x, y, key, 0).setOrigin(0.5, 1).setScale(6);
+    npc.setDepth(5);
+    npc.play({ key: `${key}-idle`, delay: Phaser.Math.Between(0, 800) });
+    return npc;
+  }
+
+  private updateNpcInteraction() {
+    const TALK_RADIUS = 120;
+    let closest: Phaser.GameObjects.Sprite | null = null;
+    let closestDist = Infinity;
+
+    for (const npc of this.npcs) {
+      const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, npc.x, npc.y);
+      if (d < TALK_RADIUS && d < closestDist) {
+        closest = npc;
+        closestDist = d;
+      }
+    }
+
+    this.nearNpc = closest;
+
+    if (this.nearNpc) {
+      this.talkPrompt.setVisible(true);
+      this.talkPrompt.setPosition(this.nearNpc.x, this.nearNpc.y - 125);
+
+      if (Phaser.Input.Keyboard.JustDown(this.keyE)) {
+        this.dialog.show("multipleChoice");
       }
     } else {
-      if (vx < 0) {
-        this.lastDir = "left";
-        this.player.anims.play("player-walk-left", true);
-      } else {
-        this.lastDir = "right";
-        this.player.anims.play("player-walk-right", true);
-      }
+      this.talkPrompt.setVisible(false);
     }
   }
 
+  // =========================
+  // Animations
+  // =========================
+
   private createPlayerAnims() {
-    const makeLoop = (key: string, start: number, end: number, frameRate: number) => {
-      if (this.anims.exists(key)) return;
-      this.anims.create({
-        key,
-        frames: this.anims.generateFrameNumbers("player", { start, end }),
-        frameRate,
-        repeat: -1,
-      });
-    };
+    this.anims.create({
+      key: "player-idle",
+      frames: this.anims.generateFrameNumbers("player", { start: 0, end: 7 }),
+      frameRate: 6,
+      repeat: -1,
+    });
 
-    // Idle rows (1–4): 0-3, 4-7, 8-11, 12-15
-    makeLoop("player-idle-down", 0, 3, 4);
-    makeLoop("player-idle-left", 4, 7, 4);
-    makeLoop("player-idle-right", 8, 11, 4);
-    makeLoop("player-idle-up", 12, 15, 4);
+    this.anims.create({
+      key: "player-walk-right",
+      frames: this.anims.generateFrameNumbers("player", { start: 9, end: 12 }),
+      frameRate: 10,
+      repeat: -1,
+    });
 
-    // Walk rows (5–8): 16-19, 20-23, 24-27, 28-31
-    makeLoop("player-walk-down", 16, 19, 10);
-    makeLoop("player-walk-left", 20, 23, 10);
-    makeLoop("player-walk-right", 24, 27, 10);
-    makeLoop("player-walk-up", 28, 31, 10);
+    this.anims.create({
+      key: "player-walk-left",
+      frames: this.anims.generateFrameNumbers("player", { start: 9, end: 12 }),
+      frameRate: 10,
+      repeat: -1,
+    });
   }
 
-  private fitBackground() {
-    if (!this.bg) return;
+  private createNpcAnims() {
+    ["npc1", "npc2", "npc3"].forEach((key) => {
+      this.anims.create({
+        key: `${key}-idle`,
+        frames: this.anims.generateFrameNumbers(key, { start: 0, end: 7 }),
+        frameRate: 8,
+        repeat: -1,
+      });
+    });
+  }
 
+  private createMentorAnims() {
+    if (this.anims.exists("mentor-idle")) return;
+
+    this.anims.create({
+        key: "mentor-idle",
+        frames: this.anims.generateFrameNumbers("mentor", {
+        start: 0,
+        end: 7,
+        }),
+        frameRate: 6,   // gentle idle motion
+        repeat: -1,     // loop forever
+    });
+  }
+
+
+  // =========================
+  // Background scaling
+  // =========================
+  private fitBackground() {
     const w = this.scale.width;
     const h = this.scale.height;
+    const img = this.textures.get("hackathon-background").getSourceImage() as HTMLImageElement;
 
     this.bg.setPosition(w / 2, h / 2);
-
-    const img = this.textures
-      .get("hackathon-background")
-      .getSourceImage() as HTMLImageElement;
-
-    // FIT: whole background visible, may letterbox
-    const scale = Math.min(w / img.width, h / img.height);
-    this.bg.setScale(scale);
+    this.bg.setScale(Math.min(w / img.width, h / img.height));
   }
 }
