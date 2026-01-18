@@ -182,7 +182,5 @@ export default class MultipleChoiceContents {
 
     const isCorrect = this.selectedIndex === this.correctIndex;
     console.log("Submitted:", this.selectedIndex, "Correct?", isCorrect);
-
-    // later: show feedback, notify Dialog, close dialog, etc.
   }
 }
