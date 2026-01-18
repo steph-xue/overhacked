@@ -7,6 +7,7 @@ import ScoreBoard from "@/game/ui/ScoreBoard";
 import GameOverDialog from "@/game/ui/GameOverDialog";
 import MentorGuide from "@/game/ui/MentorGuide";
 import LoadingDialog from "@/game/ui/LoadingDialog";
+import WinningDialog from "@/game/ui/WinningDialog";
 
 import useUserStore from "@/stores/useUserStore";
 
@@ -47,6 +48,7 @@ export default class HackathonScene extends Phaser.Scene {
   // =========================
   private npcs: Phaser.GameObjects.Sprite[] = [];
   private nearNpc: Phaser.GameObjects.Sprite | null = null;
+  private npcFetchToken = 0;
 
   // =========================
   // Dialog system
@@ -58,11 +60,15 @@ export default class HackathonScene extends Phaser.Scene {
   // Score board
   // =========================
   private scoreBoard!: ScoreBoard;
+  private completedChallenges = 0;
+  private readonly TOTAL_CHALLENGES = 3;
 
   // =========================
-  // Game over
+  // Game over/win dialogs
   // =========================
   private gameOver?: GameOverDialog;
+  private winDialog?: WinningDialog;
+  private hasWon = false;
 
   // =========================
   // Mentor guide
@@ -82,7 +88,7 @@ export default class HackathonScene extends Phaser.Scene {
   preload() {
     this.load.image(
       "hackathon-background",
-      "/assets/backgrounds/hackathon-background.png"
+      "/assets/backgrounds/hackathon-background.png",
     );
 
     this.load.spritesheet("player", "/assets/sprites/player.png", {
@@ -288,7 +294,7 @@ export default class HackathonScene extends Phaser.Scene {
 
     // Start timer + progress
     this.scoreBoard.start(180); // 3 minutes
-    this.scoreBoard.setProgress(0.5);
+    this.scoreBoard.setProgress(0);
 
     // Drag-and-Drop
     useDragDropStore.getState().fetchDragDropData();
@@ -297,9 +303,44 @@ export default class HackathonScene extends Phaser.Scene {
     this.mentorGuide = new MentorGuide(this);
 
     this.mentorGuide.show({
-        message:
-            "Welcome to OVERHACKED!\n\nTalk to judges to play coding minigames. Fill the progress bar before time runs out!",
-        durationMs: 20000,
+      message:
+        "Welcome to OVERHACKED!\n\nTalk to judges to play coding minigames. Fill the progress bar before time runs out!",
+      durationMs: 20000,
+    });
+
+    this.events.on("mcq-answered", (correct: boolean) => {
+      if (!correct) return;
+
+      this.completedChallenges++;
+
+      this.scoreBoard.setProgressByCount(
+        this.completedChallenges,
+        this.TOTAL_CHALLENGES,
+      );
+
+      const progress = this.completedChallenges / this.TOTAL_CHALLENGES;
+
+      if (!this.hasWon && progress >= 1) {
+        this.hasWon = true;
+
+        window.dispatchEvent(new CustomEvent("game-win"));
+
+        this.winDialog = new WinningDialog(this);
+        this.winDialog.mount({
+          onPlayAgain: () => {
+            this.winDialog?.unmount();
+            this.winDialog = undefined;
+            this.hasWon = false;
+            this.scene.restart();
+          },
+          onQuit: () => {
+            this.winDialog?.unmount();
+            this.winDialog = undefined;
+            this.hasWon = false;
+            window.location.href = "/";
+          },
+        });
+      }
     });
   }
 
@@ -310,7 +351,7 @@ export default class HackathonScene extends Phaser.Scene {
     if (!this.dialog) return;
 
     // Freeze player while ANY overlay is open
-    if (this.dialog.isOpen() || this.loadingDialog) {
+    if (this.dialog.isOpen() || this.loadingDialog || this.winDialog) {
       this.player.setVelocity(0, 0);
       return;
     }
@@ -402,7 +443,7 @@ export default class HackathonScene extends Phaser.Scene {
         this.player.x,
         this.player.y,
         npc.x,
-        npc.y
+        npc.y,
       );
       if (d < TALK_RADIUS && d < closestDist) {
         closest = npc;
@@ -418,10 +459,10 @@ export default class HackathonScene extends Phaser.Scene {
 
       if (Phaser.Input.Keyboard.JustDown(this.keyE)) {
         const { data, loading, error } = useNpcStore.getState();
-        
+
         if (error) {
-        console.log("NPC error:", error);
-            return;
+          console.log("NPC error:", error);
+          return;
         }
 
         // If already fetching, just show loading UI
@@ -432,19 +473,17 @@ export default class HackathonScene extends Phaser.Scene {
 
         // If we don't have data yet, fetch it (and show loading immediately)
         if (!data) {
-            void this.openNpcMinigame(); // open loading -> await fetch -> swap to multipleChoice
-            return;
+          void this.openNpcMinigame(); // open loading -> await fetch -> swap to multipleChoice
+          return;
         }
 
         this.dialog.show("multipleChoice");
-      }
-      else if( Phaser.Input.Keyboard.JustDown(this.keyD)) {
+      } else if (Phaser.Input.Keyboard.JustDown(this.keyD)) {
         this.dialog.show("dragAndDrop");
       }
     } else {
       this.talkPrompt.setVisible(false);
-      this.hideLoading();
-      
+      this.cancelNpcLoading();
     }
   }
 
@@ -501,41 +540,46 @@ export default class HackathonScene extends Phaser.Scene {
   }
 
   private async openNpcMinigame() {
-    // show loading instantly
     this.showLoading();
 
-    // ensure data fetch starts (if your store already fetches once at create, this is still safe)
+    const myToken = ++this.npcFetchToken; // token for THIS request
     const npcStore = useNpcStore.getState();
 
-    // If you have a promise-returning fetch, await it.
-    // If fetchNpcData does NOT return a promise, make it return the fetch() promise in the store.
     try {
-        await npcStore.fetchNpcData(); // <-- make sure this returns Promise<void>
+      await npcStore.fetchNpcData();
 
-        // close loading, open real dialog
-        this.hideLoading();
-        this.dialog.show("multipleChoice");
+      // if user canceled / walked away, ignore
+      if (myToken !== this.npcFetchToken) return;
+
+      this.hideLoading();
+      this.dialog.show("multipleChoice");
     } catch (e) {
-        console.error(e);
-        // optional: show an error content type if you have one
-        // this.dialog.show("error");
-        this.hideLoading();
-        this.dialog.hide(); // simplest fallback
+      if (myToken !== this.npcFetchToken) return;
+
+      console.error(e);
+      this.hideLoading();
+      this.dialog.hide();
     }
   }
 
-    private showLoading() {
-        if (this.loadingDialog) return;
-        this.loadingDialog = new LoadingDialog(this);
-    }
+  private showLoading() {
+    if (this.loadingDialog) return;
 
+    this.loadingDialog = new LoadingDialog(this, () => {
+      // X pressed
+      this.cancelNpcLoading();
+    });
+  }
 
-    private hideLoading() {
-        this.loadingDialog?.destroy();
-        this.loadingDialog = undefined;
-    }
+  private cancelNpcLoading() {
+    this.npcFetchToken++; // invalidate in-flight fetch
+    this.hideLoading(); // close UI + unfreeze movement
+  }
 
-
+  private hideLoading() {
+    this.loadingDialog?.destroy();
+    this.loadingDialog = undefined;
+  }
 
   // =========================
   // Background scaling
@@ -554,5 +598,6 @@ export default class HackathonScene extends Phaser.Scene {
   shutdown() {
     this.scoreBoard?.unmount();
     this.gameOver?.unmount();
+    this.winDialog?.unmount();
   }
 }
