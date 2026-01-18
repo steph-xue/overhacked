@@ -13,14 +13,30 @@ export default class DragAndDropContents {
     inDropZone: boolean;
   }[] = [];
 
+  // constructor(
+  //   scene: Phaser.Scene,
+  //   root: Phaser.GameObjects.Container,
+  //   contentW: number
+  // ) {
+  //   this.scene = scene;
+  //   this.root = root;
+  //   this.contentW = contentW;
+  // }
+
+
+
+  private onAnswer?: (isCorrect: boolean) => void;
+
   constructor(
     scene: Phaser.Scene,
     root: Phaser.GameObjects.Container,
-    contentW: number
+    contentW: number,
+    onAnswer?: (isCorrect: boolean) => void
   ) {
     this.scene = scene;
     this.root = root;
     this.contentW = contentW;
+    this.onAnswer = onAnswer;
   }
 
   mount() {
@@ -176,7 +192,7 @@ export default class DragAndDropContents {
       const cardInfo = { label: card.label, rect, inDropZone: false };
       this.cardData.push(cardInfo);
 
-      rect.on("drag", (_pointer, dragX, dragY) => {
+      rect.on("drag", (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
         rect.x = dragX;
         rect.y = dragY;
 
@@ -223,6 +239,7 @@ export default class DragAndDropContents {
     console.log("Submitted order:", finalOrder);
     const { data } = useCodingQuizStore.getState();
     if (!data) {
+      this.onAnswer?.(false)
       console.log("No quiz data available");
       return;
     }
@@ -233,6 +250,7 @@ export default class DragAndDropContents {
       console.log("Not all cards placed!");
     } else {
       const isCorrect = this.isCorrectOrder(finalOrder, data.answer);
+      this.onAnswer?.(isCorrect);
       console.log("All cards submitted!");
       if (isCorrect) {
         console.log("Correct order!");
