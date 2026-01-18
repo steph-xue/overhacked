@@ -1,7 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Silkscreen } from "next/font/google";
+import { useState } from "react";
+import PopupForm from "./PopupForm";
 
 const silkscreen = Silkscreen({
   subsets: ["latin"],
@@ -9,16 +10,13 @@ const silkscreen = Silkscreen({
 });
 
 export default function StartHackingButton() {
-  const router = useRouter();
+    const [isOpen, setIsOpen] = useState(false);
 
-  const handleEnter = () => {
-    router.push("/hackathon");
-  };
-
-  return (
-    <button
-    onClick={handleEnter}
-    className={`
+    return (
+      <>
+        <button 
+          onClick={() => setIsOpen(true)}
+          className={`
         bg-[#4A3F35] hover:bg-[#614f3f]
         text-white font-bold
         text-2xl
@@ -28,9 +26,11 @@ export default function StartHackingButton() {
         rounded-lg transition
         cursor-pointer
     `}
-    >
-        Start Hacking
-    </button>
+        >
+          Enter Hackathon
+        </button>
 
-  );
+        {isOpen && <PopupForm onClose={() => setIsOpen(false)} />}
+      </>
+    );
 }
