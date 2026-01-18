@@ -31,6 +31,9 @@ export default class HackathonScene extends Phaser.Scene {
 
   private playerName!: Phaser.GameObjects.Text;
 
+  // Testing to see if the music works
+  private bgm?: Phaser.Sound.BaseSound;
+
   // =========================
   // Interaction / UI
   // =========================
@@ -105,6 +108,9 @@ export default class HackathonScene extends Phaser.Scene {
       frameWidth: 24,
       frameHeight: 24,
     });
+
+    // Load the audio
+    this.load.audio("bgm", "/assets/audio/hackathon-audio.wav");
   }
 
   // =========================
@@ -145,6 +151,12 @@ export default class HackathonScene extends Phaser.Scene {
     this.createPlayerAnims();
     this.createNpcAnims();
     this.createMentorAnims();
+
+    // =========================
+    // Music
+    // =========================
+    this.bgm = this.sound.add("bgm", { loop: true, volume: 0.5 });
+    this.bgm.play();
 
     // =========================
     // Player setup
