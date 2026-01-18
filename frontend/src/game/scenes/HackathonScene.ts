@@ -71,8 +71,9 @@ export default class HackathonScene extends Phaser.Scene {
   // Score board
   // =========================
   private scoreBoard!: ScoreBoard;
-  private completedChallenges = 0;
-  private readonly TOTAL_CHALLENGES = 3;
+  private progress = 0; 
+  private readonly MCQ_PROGRESS = 0.25;
+  private readonly DND_PROGRESS = 0.5;
   
 
   // =========================
@@ -176,12 +177,14 @@ export default class HackathonScene extends Phaser.Scene {
     this.gameOver?.unmount();
     this.gameOver = undefined;
 
+    this.progress = 0;
     this.hasWon = false;
-    this.completedChallenges = 0;
+    
     this.npcFetchToken = 0;
 
     // IMPORTANT: prevent stacking listeners across restarts
     this.events.off("mcq-answered");
+    this.events.off("dnd-answered");
 
     // Ensure crisp pixel rendering
     this.textures.get("player").setFilter(Phaser.Textures.FilterMode.NEAREST);
@@ -389,7 +392,7 @@ export default class HackathonScene extends Phaser.Scene {
     });
 
     // Start timer + progress
-    this.scoreBoard.start(180); // 3 minutes
+    this.scoreBoard.start(120); // 2 minutes
     this.scoreBoard.setProgress(0);
 
     // Drag-and-Drop
@@ -418,40 +421,50 @@ export default class HackathonScene extends Phaser.Scene {
           });
     });
 
+    // Add progress for multiple choice answers
     this.events.on("mcq-answered", (correct: boolean) => {
-      if (!correct) return;
+        if (!correct) return;
 
-      this.completedChallenges++;
+        this.addProgress(this.MCQ_PROGRESS);
+    });
 
-      this.scoreBoard.setProgressByCount(
-        this.completedChallenges,
-        this.TOTAL_CHALLENGES,
-      );
+    // Add progress for drag and drop answers
+    this.events.off("dnd-answered");
+    this.events.on("dnd-answered", (correct: boolean) => {
+        if (!correct) return;
 
-      const progress = this.completedChallenges / this.TOTAL_CHALLENGES;
+        this.addProgress(this.DND_PROGRESS);
+    });
+  }
 
-      if (!this.hasWon && progress >= 1) {
+    // Add progress and check for win condition
+    private addProgress(delta: number) {
+        if (this.hasWon) return;
+
+    this.progress = Phaser.Math.Clamp(this.progress + delta, 0, 1);
+    this.scoreBoard.setProgress(this.progress);
+
+    if (this.progress >= 1) {
         this.hasWon = true;
 
         window.dispatchEvent(new CustomEvent("game-win"));
 
         this.winDialog = new WinningDialog(this);
         this.winDialog.mount({
-          onPlayAgain: () => {
+        onPlayAgain: () => {
             this.winDialog?.unmount();
             this.winDialog = undefined;
             this.hasWon = false;
             this.scene.restart();
-          },
-          onQuit: () => {
+        },
+        onQuit: () => {
             this.winDialog?.unmount();
             this.winDialog = undefined;
             this.hasWon = false;
             window.location.href = "/";
-          },
+        },
         });
       }
-    });
   }
 
   // =========================
