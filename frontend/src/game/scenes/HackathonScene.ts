@@ -304,7 +304,7 @@ export default class HackathonScene extends Phaser.Scene {
 
     this.mentorGuide.show({
       message:
-        "Welcome to OVERHACKED!\n\nTalk to judges to play coding minigames. Fill the progress bar before time runs out!",
+        "Welcome to OVERHACKED!\n\nTalk to teammates to help them with their coding problems. Fill the progress bar before time runs out!",
       durationMs: 20000,
     });
 
