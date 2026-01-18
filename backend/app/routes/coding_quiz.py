@@ -36,28 +36,20 @@ async def ask_agent(request: CodingQuizRequest) -> CodingQuizResponse:
         expected_output=f"""Always respond in **valid JSON only** with exactly two fields:
         1. "question": a string containing the quiz question.
         2. "answer": an array of strings, each string is one line of code or text, preserving all indentation, spaces, and formatting exactly.
-
+        Ensure the "answer" array contains fewer than 15 lines total and includes no comments and no empty lines. Ensure each line is less than 30 characters long including spaces.
         Example:
         {{
             "question": "Write a Java class Car with fields brand, model, year, constructor, and displayDetails method.",
             "answer": [
                 "public class Car {{",
-                "    // Fields (Attributes)",
                 "    String brand;",
-                "    String model;",
-                "    int year;",
-                "",
-                "    // Constructor (special method to initialize objects)",
-                "    public Car(String brand, String model, int year) {{",
+                "    public Car(String brand) {{",
                 "        this.brand = brand;",
-                "        this.model = model;",
-                "        this.year = year;",
                 "    }}",
-                "",
-        "    // Method (Behavior)",
-        "    public void displayDetails() {{",
-        "        System.out.println(\\"Brand: \\" + brand + \\", Model: \\" + model + \\", Year: \\" + year);",
-        "    }}",
+                "    public void displayDetails() {{",
+                "        System.out.println(\\"Brand: \\" + brand);",
+                "    }}",
+            ]
         "}}"
     ]
     }}

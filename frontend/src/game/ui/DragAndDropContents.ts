@@ -1,4 +1,5 @@
 import * as Phaser from "phaser";
+import { useCodingQuizStore } from "@/stores/useCodingQuizStore";
 
 export default class DragAndDropContents {
   private scene: Phaser.Scene;
@@ -6,9 +7,17 @@ export default class DragAndDropContents {
   private contentW: number;
 
   private objects: Phaser.GameObjects.GameObject[] = [];
-  private cardData: { label: string; rect: Phaser.GameObjects.Rectangle; labelObj: Phaser.GameObjects.Text; index: number }[] = [];
+  private cardData: {
+    label: string;
+    rect: Phaser.GameObjects.Rectangle;
+    inDropZone: boolean;
+  }[] = [];
 
-  constructor(scene: Phaser.Scene, root: Phaser.GameObjects.Container, contentW: number) {
+  constructor(
+    scene: Phaser.Scene,
+    root: Phaser.GameObjects.Container,
+    contentW: number
+  ) {
     this.scene = scene;
     this.root = root;
     this.contentW = contentW;
@@ -17,41 +26,100 @@ export default class DragAndDropContents {
   mount() {
     const s = this.scene;
 
+    const { data, loading, error } = useCodingQuizStore.getState();
+    if (loading || !data) {
+      const txt = s.add.text(0, 0, "Loading question...", {
+        fontFamily: "Silkscreen",
+        fontSize: "32px",
+        color: "#4A3F35",
+      });
+
+      this.root.add(txt);
+      this.objects.push(txt);
+      return;
+    }
+    if (error) {
+      const txt = s.add.text(0, 0, "Failed to load question", {
+        fontFamily: "Silkscreen",
+        fontSize: "32px",
+        color: "#B00020",
+      });
+
+      this.root.add(txt);
+      this.objects.push(txt);
+      return;
+    }
+
+    const { question, answer } = data;
+
     // -------------------------
     // TITLE
     // -------------------------
-    const title = s.add.text(0, 0, "Coding Question", {
+    const title = s.add.text(0, 0, "Drag and Drop", {
       fontFamily: "Silkscreen",
       fontStyle: "bold",
       fontSize: "50px",
       color: "#4A3F35",
     });
 
-    const body = s.add.text(0, 80, "Drag the code pieces into correct order.", {
-      fontFamily: "Silkscreen",
-      fontSize: "24px",
-      color: "#4A3F35",
-      wordWrap: { width: this.contentW },
-    });
+    const body = s.add.text(
+      0,
+      80,
+      question || "Drag cards from left to right.",
+      {
+        fontFamily: "Silkscreen",
+        fontSize: "24px",
+        color: "#4A3F35",
+        wordWrap: { width: this.contentW },
+      }
+    );
 
     this.root.add(title);
     this.root.add(body);
     this.objects.push(title, body);
 
     // -------------------------
+    // AREAS (side-by-side layout: left = start, right = destination)
+    // -------------------------
+    const startX = 25; // left column
+    const startY = 200;
+
+    const destX = 525; // right column
+    const destY = startY;
+    const areaW = 500;
+    const areaH = 600;
+
+    // Destination area
+    const destArea = s.add
+      .rectangle(destX, destY, areaW, areaH, 0x000000, 0.08)
+      .setOrigin(0, 0);
+
+    const destLabel = s.add
+      .text(destX + 10, destY + 10, "DROP HERE", {
+        fontFamily: "Silkscreen",
+        fontSize: "18px",
+        color: "#4A3F35",
+      })
+      .setOrigin(0, 0);
+
+    this.root.add(destArea);
+    this.root.add(destLabel);
+    this.objects.push(destArea, destLabel);
+
+    // -------------------------
     // SUBMIT BUTTON
     // -------------------------
-    const submitY = 800;
+    const submitY = destY + areaH + 30;
     const submitRect = s.add
-      .rectangle(400, submitY, 250, 80, 0x000000, 0.14)
+      .rectangle(destX + areaW / 2, submitY, 250, 76, 0x000000, 0.14)
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
     const submitText = s.add
-      .text(400, submitY, "Submit", {
+      .text(destX + areaW / 2, submitY, "Submit", {
         fontFamily: "Silkscreen",
         fontStyle: "bold",
-        fontSize: "20px",
+        fontSize: "28px",
         color: "#4A3F35",
       })
       .setOrigin(0.5);
@@ -65,50 +133,74 @@ export default class DragAndDropContents {
     this.objects.push(submitRect, submitText);
 
     // -------------------------
-    // CARDS
+    // CARDS (vertical stack on the left)
     // -------------------------
-    const cards = [
-      { label: "Array", color: 0x88cc88 },
-      { label: "HashMap", color: 0x88aacc },
-      { label: "LinkedList", color: 0xcc88aa },
-      { label: "Stack", color: 0xccaa88 },
-      { label: "Queue", color: 0xaa88cc },
-    ];
+    const originalCards = answer.map((label: string) => {
+      // generate a pale color
+      const r = 200 + Math.floor(Math.random() * 56); // 200-255
+      const g = 200 + Math.floor(Math.random() * 56); // 200-255
+      const b = 200 + Math.floor(Math.random() * 56); // 200-255
 
-    const cardW = 800;
-    const cardH = 110;
+      const color = (r << 16) + (g << 8) + b; // convert RGB to hex number
+
+      return { label, color };
+    });
+
+    const cards = this.shuffleArray(originalCards);
+
+    const cardW = 450;
+    const cardH = 30;
     const cardGap = 10;
-    const cardStartX = 0;
-    const cardStartY = 130;
 
     cards.forEach((card, i) => {
-      const x = cardStartX;
-      const y = cardStartY + i * (cardH + cardGap);
+      const x = startX;
+      const y = startY + i * (cardH + cardGap);
 
       const rect = s.add
         .rectangle(x, y, cardW, cardH, card.color, 1)
         .setOrigin(0, 0)
         .setInteractive({ useHandCursor: true, draggable: true });
 
-      const label = s.add.text(x + cardW / 2, y + cardH / 2, card.label, {
-        fontFamily: "Silkscreen",
-        fontSize: "16px",
-        color: "#000000",
-      }).setOrigin(0.5);
+      const paddingX = 12;
 
-      s.input.setDraggable(rect);
+      const label = s.add
+        .text(x + paddingX, y + cardH / 2, card.label, {
+          fontFamily: "Silkscreen",
+          fontSize: "14px",
+          color: "#000000",
+        })
+        .setOrigin(0, 0.5); // left, vertical center
 
-      const cardInfo = { label: card.label, rect, labelObj: label, index: i };
+      const originalX = x;
+      const originalY = y;
+      const cardInfo = { label: card.label, rect, inDropZone: false };
       this.cardData.push(cardInfo);
 
-      rect.on("drag", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-        rect.x = cardStartX;
+      rect.on("drag", (_pointer, dragX, dragY) => {
+        rect.x = dragX;
         rect.y = dragY;
-        label.setPosition(cardStartX + cardW / 2, dragY + cardH / 2);
+
+        label.setPosition(rect.x + paddingX, rect.y + cardH / 2);
       });
 
       rect.on("dragend", () => {
-        this.reorderCards(cardStartY, cardH, cardGap, cardStartX, cardW);
+        const cardCenterX = rect.x + cardW / 2;
+        const cardCenterY = rect.y + cardH / 2;
+
+        if (
+          cardCenterX > destX &&
+          cardCenterX < destX + areaW &&
+          cardCenterY > destY &&
+          cardCenterY < destY + areaH
+        ) {
+          cardInfo.inDropZone = true;
+        } else {
+          // Snap back
+          rect.x = originalX;
+          rect.y = originalY;
+          label.setPosition(originalX + paddingX, originalY + cardH / 2);
+          cardInfo.inDropZone = false;
+        }
       });
 
       this.root.add(rect);
@@ -117,26 +209,52 @@ export default class DragAndDropContents {
     });
   }
 
-  private reorderCards(startY: number, cardH: number, cardGap: number, startX: number, cardW: number) {
-    // Sort by current Y position
-    this.cardData.sort((a, b) => a.rect.y - b.rect.y);
-
-    // Snap each card to its new slot
-    this.cardData.forEach((card, i) => {
-      const newY = startY + i * (cardH + cardGap);
-      card.rect.y = newY;
-      card.labelObj.setPosition(startX + cardW / 2, newY + cardH / 2);
-      card.index = i;
-    });
-  }
-
   getFinalOrder(): string[] {
-    return this.cardData.map(c => c.label);
+    const sorted = [...this.cardData]
+      .filter((c) => c.inDropZone)
+      .sort((a, b) => a.rect.y - b.rect.y)
+      .map((c) => c.label);
+
+    return sorted;
   }
 
   private submit() {
     const finalOrder = this.getFinalOrder();
     console.log("Submitted order:", finalOrder);
+    const { data } = useCodingQuizStore.getState();
+    if (!data) {
+      console.log("No quiz data available");
+      return;
+    }
+
+    if (finalOrder.length === 0) {
+      console.log("No cards in drop zone!");
+    } else if (finalOrder.length < this.cardData.length) {
+      console.log("Not all cards placed!");
+    } else {
+      const isCorrect = this.isCorrectOrder(finalOrder, data.answer);
+      console.log("All cards submitted!");
+      if (isCorrect) {
+        console.log("Correct order!");
+      } else {
+        console.log("Incorrect order.");
+      }
+    }
+  }
+
+  private shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
+  private isCorrectOrder(submitted: string[], correct: string[]): boolean {
+    if (submitted.length !== correct.length) return false;
+
+    return submitted.every((value, index) => value === correct[index]);
   }
 
   unmount() {
