@@ -28,3 +28,4 @@ def root():
 # MCQ router
 app.include_router(mcq_router)
 app.include_router(coding_quiz_router)
+app.include_router(drag_drop_router)

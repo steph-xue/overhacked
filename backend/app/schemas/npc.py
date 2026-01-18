@@ -38,18 +38,25 @@ class CodingQuizResponse(BaseModel):
     
 # The Drag and Drop Item structure
 class DragDropItem(BaseModel):
-    id: str
+    id: Optional[str] = None
     text: str
 
+class DragDropGenerateRequest(BaseModel):
+    language: str
+    experience: int
+    username: Optional[str] = None
+    question_mode: Literal["reorder"] = "reorder"
+
 # The Drag and Drop Question response we get back from the NPC after the initial player interaction
-class DragDropResponse(BaseModel):
+class DragDropQuestion(BaseModel):
     question_type: Literal["drag_drop"]
+    question_mode: Literal["reorder"]
     question_text: str
     items_to_drag: List[str]
     drop_zones: List[str]
     
 # The response provided back from the NPC after the player completes the Drag and Drop question
-class DragDrop_AnswerResponse(BaseModel):
+class DragDropResponse(BaseModel):
     is_correct: bool
     correct_mapping: Optional[dict] = None
     explanation: Optional[str] = None
