@@ -3,7 +3,7 @@
 import { useState } from "react";
 import PopupForm from "./PopupForm";
 
-export default function EnterHackathonButton() {
+export default function StartHackingButton() {
 
     const [isOpen, setIsOpen] = useState(false);
   

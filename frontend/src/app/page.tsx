@@ -1,4 +1,4 @@
-import EnterHackathonButton from "@/components/EnterHackathonButton";
+import StartHackingButton from "@/components/StartHackingButton";
 
 export default function Home() {
   return (
@@ -6,7 +6,7 @@ export default function Home() {
       <h1 className="text-4xl font-semibold mb-6">
         OverHacked
       </h1>
-      <EnterHackathonButton />
+      <StartHackingButton />
     </main>
   );
 }
