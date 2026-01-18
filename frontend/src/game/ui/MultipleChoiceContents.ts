@@ -1,5 +1,6 @@
 // src/game/ui/MultipleChoiceContents.ts
 import * as Phaser from "phaser";
+import { useNpcStore } from "@/stores/useNpcStore";
 
 export default class MultipleChoiceContents {
   private scene: Phaser.Scene;
@@ -11,9 +12,13 @@ export default class MultipleChoiceContents {
   private selectedIndex: number | null = null;
 
   // hard-coded correct answer for now (Inheritance)
-  private readonly correctIndex = 2;
+  private correctIndex = 0;
 
-  constructor(scene: Phaser.Scene, root: Phaser.GameObjects.Container, contentW: number) {
+  constructor(
+    scene: Phaser.Scene,
+    root: Phaser.GameObjects.Container,
+    contentW: number
+  ) {
     this.scene = scene;
     this.root = root;
     this.contentW = contentW;
@@ -22,11 +27,40 @@ export default class MultipleChoiceContents {
   mount() {
     const s = this.scene;
 
+    const { data, loading, error } = useNpcStore.getState();
+
+    if (loading || !data) {
+      const txt = s.add.text(0, 0, "Loading question...", {
+        fontFamily: "Silkscreen",
+        fontSize: "32px",
+        color: "#4A3F35",
+      });
+
+      this.root.add(txt);
+      this.objects.push(txt);
+      return;
+    }
+
+    if (error) {
+      const txt = s.add.text(0, 0, "Failed to load question", {
+        fontFamily: "Silkscreen",
+        fontSize: "32px",
+        color: "#B00020",
+      });
+
+      this.root.add(txt);
+      this.objects.push(txt);
+      return;
+    }
+
     // -------------------------
     // QUESTION TITLE + TEXT
     // -------------------------
+    const { question, choices, answer } = data;
+    this.correctIndex = answer;
     const questionTitle = "Question";
     const questionText =
+      question ||
       "Which OOP principle allows a class to inherit behavior from another class?";
 
     const title = s.add.text(0, 0, questionTitle, {
@@ -50,7 +84,12 @@ export default class MultipleChoiceContents {
     // -------------------------
     // ANSWERS
     // -------------------------
-    const answers = ["Encapsulation", "Abstraction", "Inheritance", "Polymorphism"];
+    const answers = choices || [
+      "Encapsulation",
+      "Abstraction",
+      "Inheritance",
+      "Polymorphism",
+    ];
 
     const startY = 270;
     const gap = 100;
@@ -143,7 +182,5 @@ export default class MultipleChoiceContents {
 
     const isCorrect = this.selectedIndex === this.correctIndex;
     console.log("Submitted:", this.selectedIndex, "Correct?", isCorrect);
-
-    // later: show feedback, notify Dialog, close dialog, etc.
   }
 }

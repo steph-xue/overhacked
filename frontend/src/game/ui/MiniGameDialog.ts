@@ -14,7 +14,7 @@ export type DialogContentType = "multipleChoice" | "dragAndDrop";
  *   - Left = main content (ratio)
  *   - Right = hint content (remaining width)
  */
-export default class Dialog {
+export default class MiniGameDialog {
   private scene: Phaser.Scene;
 
   private ui!: Phaser.GameObjects.Container;
@@ -43,12 +43,8 @@ export default class Dialog {
   private activeContent: { mount: () => void; unmount: () => void } | null = null;
   private hintContent: HintContent | null = null;
 
-  private registry: Record<
-    DialogContentType,
-    () => { mount: () => void; unmount: () => void }
-  > = {
-    multipleChoice: () =>
-      new MultipleChoiceContents(this.scene, this.mainRoot, this.getMainContentWidth()),
+  private registry: Record<DialogContentType,() => { mount: () => void; unmount: () => void }> = {
+    multipleChoice: () => new MultipleChoiceContents(this.scene, this.mainRoot, this.getMainContentWidth()),
     dragAndDrop: () =>
       new DragAndDropContents(this.scene, this.mainRoot, this.getMainContentWidth()),
   };
@@ -130,7 +126,7 @@ export default class Dialog {
   // -------------------------
   private buildShell(depth: number, bgHex: string) {
     const s = this.scene;
-    const bgColor = Dialog.hexToNumber(bgHex);
+    const bgColor = MiniGameDialog.hexToNumber(bgHex);
 
     const border = s.add
       .rectangle(0, 0, this.panelW + 6, this.panelH + 6, 0x3b3b3b, 1)
