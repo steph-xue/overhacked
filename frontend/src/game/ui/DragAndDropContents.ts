@@ -13,18 +13,6 @@ export default class DragAndDropContents {
     inDropZone: boolean;
   }[] = [];
 
-  // constructor(
-  //   scene: Phaser.Scene,
-  //   root: Phaser.GameObjects.Container,
-  //   contentW: number
-  // ) {
-  //   this.scene = scene;
-  //   this.root = root;
-  //   this.contentW = contentW;
-  // }
-
-
-
   private onAnswer?: (isCorrect: boolean) => void;
 
   constructor(
@@ -67,6 +55,7 @@ export default class DragAndDropContents {
     }
 
     const { question, answer } = data;
+    console.log("CORRECT ANSWER:", answer);
 
     // -------------------------
     // TITLE
@@ -234,31 +223,54 @@ export default class DragAndDropContents {
     return sorted;
   }
 
-  private submit() {
-    const finalOrder = this.getFinalOrder();
-    console.log("Submitted order:", finalOrder);
-    const { data } = useCodingQuizStore.getState();
-    if (!data) {
-      this.onAnswer?.(false)
-      console.log("No quiz data available");
-      return;
-    }
+  // private submit() {
+  //   const finalOrder = this.getFinalOrder();
+  //   console.log("Submitted order:", finalOrder);
+  //   const { data } = useCodingQuizStore.getState();
+  //   console.log("Correct answer:", data?.answer);
+  //   if (!data) {
+  //     this.onAnswer?.(false)
+  //     console.log("No quiz data available");
+  //     return;
+  //   }
 
-    if (finalOrder.length === 0) {
-      console.log("No cards in drop zone!");
-    } else if (finalOrder.length < this.cardData.length) {
-      console.log("Not all cards placed!");
-    } else {
-      const isCorrect = this.isCorrectOrder(finalOrder, data.answer);
-      this.onAnswer?.(isCorrect);
-      console.log("All cards submitted!");
-      if (isCorrect) {
-        console.log("Correct order!");
-      } else {
-        console.log("Incorrect order.");
-      }
-    }
+  //   if (finalOrder.length === 0) {
+  //     console.log("No cards in drop zone!");
+  //   } else if (finalOrder.length < this.cardData.length) {
+  //     console.log("Not all cards placed!");
+  //   } else {
+  //     const isCorrect = this.isCorrectOrder(finalOrder, data.answer);
+  //     this.onAnswer?.(isCorrect);
+  //     console.log("All cards submitted!");
+  //     if (isCorrect) {
+  //       console.log("Correct order!");
+  //     } else {
+  //       console.log("Incorrect order.");
+  //     }
+  //   }
+  // }
+
+  private submit() {
+  const finalOrder = this.getFinalOrder();
+  const { data } = useCodingQuizStore.getState();
+  
+  if (!data) {
+    this.onAnswer?.(false);
+    return;
   }
+
+  if (finalOrder.length !== this.cardData.length) {
+    console.log(`Only ${finalOrder.length}/${this.cardData.length} cards placed`);
+    return;
+  }
+
+  const isCorrect = this.isCorrectOrder(finalOrder, data.answer);
+  
+  // Emit the event for HackathonScene to catch
+  this.scene.events.emit("dnd-answered", isCorrect);
+  
+  this.onAnswer?.(isCorrect);
+}
 
   private shuffleArray<T>(array: T[]): T[] {
     const shuffled = [...array];
