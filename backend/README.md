@@ -63,6 +63,10 @@ curl http://127.0.0.1:8000/
     "Polymorphism",
     "Compilation to bytecode"
   ],
-  "answer": 3 // index of the correct answer
+  "answer": 3,
+  "hints": [
+    "Python classes support object-oriented programming features like inheritance, encapsulation, and polymorphism.",
+    "Python code is interpreted and compiled to bytecode automatically, but 'compilation to bytecode' is not a feature of the class itself."
+  ]
 }
 ```

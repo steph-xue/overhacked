@@ -18,6 +18,7 @@ class MCQResponse(BaseModel):
     question: str
     choices: List[str]
     answer: int
+    hints: List[str]
 
 class MCQRequest(BaseModel):
     # session_id: str??
