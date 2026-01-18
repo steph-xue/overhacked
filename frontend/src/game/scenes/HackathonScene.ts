@@ -34,6 +34,7 @@ export default class HackathonScene extends Phaser.Scene {
   // Interaction / UI
   // =========================
   private keyE!: Phaser.Input.Keyboard.Key;
+  private keyD!: Phaser.Input.Keyboard.Key;
   private talkPrompt!: Phaser.GameObjects.Text;
 
   // =========================
@@ -121,6 +122,7 @@ export default class HackathonScene extends Phaser.Scene {
     // Input
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.keyE = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    this.keyD = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
     // =========================
     // Background
@@ -370,6 +372,9 @@ export default class HackathonScene extends Phaser.Scene {
         if (data) {
           this.dialog.show("multipleChoice");
         }
+      }
+      else if( Phaser.Input.Keyboard.JustDown(this.keyD)) {
+        this.dialog.show("dragAndDrop");
       }
     } else {
       this.talkPrompt.setVisible(false);
