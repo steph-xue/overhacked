@@ -1,5 +1,5 @@
 from fastapi import APIRouter, FastAPI
-from app.routes import mcq_router, coding_quiz_router
+from app.routes import mcq_router, coding_quiz_router, drag_drop_router
 # Create FastAPI instance
 app = FastAPI()
 router = APIRouter()
@@ -12,3 +12,4 @@ def root():
 # MCQ router
 app.include_router(mcq_router)
 app.include_router(coding_quiz_router)
+app.include_router(drag_drop_router)
