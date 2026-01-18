@@ -4,6 +4,8 @@ import { useNpcStore } from "@/stores/useNpcStore";
 import ScoreBoard from "@/game/ui/ScoreBoard";
 import GameOverDialog from "@/game/ui/GameOverDialog";
 
+import useUserStore from "@/stores/useUserStore";
+
 /**
  * HackathonScene
  * ---------------
@@ -149,9 +151,11 @@ export default class HackathonScene extends Phaser.Scene {
     this.player.setDepth(1);
     this.player.anims.play("player-idle", true);
 
+    const { name } = useUserStore.getState();
+
     // Player name tag
     this.playerName = this.add
-      .text(this.player.x, this.player.y, "Player", {
+      .text(this.player.x, this.player.y, name || "Player", {
         fontFamily: "monospace",
         fontSize: "22px",
         color: "#ffffff",
