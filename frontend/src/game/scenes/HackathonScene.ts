@@ -74,11 +74,26 @@ export default class HackathonScene extends Phaser.Scene {
       frameHeight: 24,
     });
 
-    this.load.spritesheet("npc1", "/assets/sprites/npc1.png", { frameWidth: 24, frameHeight: 24 });
-    this.load.spritesheet("npc2", "/assets/sprites/npc2.png", { frameWidth: 24, frameHeight: 24 });
-    this.load.spritesheet("npc3", "/assets/sprites/npc3.png", { frameWidth: 24, frameHeight: 24 });
-    this.load.spritesheet("npc4", "/assets/sprites/npc4.png", { frameWidth: 24, frameHeight: 24 });
-    this.load.spritesheet("npc5", "/assets/sprites/npc5.png", { frameWidth: 24, frameHeight: 24 });
+    this.load.spritesheet("npc1", "/assets/sprites/npc1.png", {
+      frameWidth: 24,
+      frameHeight: 24,
+    });
+    this.load.spritesheet("npc2", "/assets/sprites/npc2.png", {
+      frameWidth: 24,
+      frameHeight: 24,
+    });
+    this.load.spritesheet("npc3", "/assets/sprites/npc3.png", {
+      frameWidth: 24,
+      frameHeight: 24,
+    });
+    this.load.spritesheet("npc4", "/assets/sprites/npc4.png", {
+      frameWidth: 24,
+      frameHeight: 24,
+    });
+    this.load.spritesheet("npc5", "/assets/sprites/npc5.png", {
+      frameWidth: 24,
+      frameHeight: 24,
+    });
 
     this.load.spritesheet("mentor", "/assets/sprites/mentor.png", {
       frameWidth: 24,
@@ -216,6 +231,7 @@ export default class HackathonScene extends Phaser.Scene {
     // Dialog system
     // =========================
     this.dialog = new MiniGameDialog(this, { bgHex: "#F3E9D9" });
+    useNpcStore.getState().fetchNpcData();
   }
 
   // =========================
