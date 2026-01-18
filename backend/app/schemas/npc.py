@@ -72,3 +72,12 @@ class Debugging_AnswerResponse(BaseModel):
     is_correct: bool
     corrected_code: Optional[str] = None
     explanation: Optional[str] = None
+
+class MCQItem(BaseModel):
+    question: str
+    choices: List[str]
+    answer: int
+
+class MCQResponse2(BaseModel):
+    quizzes: List[MCQItem]
+    hints: List[List[str]]

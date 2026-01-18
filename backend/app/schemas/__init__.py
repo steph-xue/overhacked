@@ -2,6 +2,7 @@ from .npc import (
     NPCInteractRequest,
     MCQRequest,
     MCQResponse,
+    MCQResponse2,
     DragDropItem,
     DragDropGenerateRequest,
     DragDropQuestion,

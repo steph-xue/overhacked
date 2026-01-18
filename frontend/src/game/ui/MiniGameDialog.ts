@@ -1,9 +1,11 @@
 // src/game/ui/Dialog.ts
 import * as Phaser from "phaser";
 import MultipleChoiceContents from "./MultipleChoiceContents";
+import MultipleChoiceContents2 from "./MutipleChoiceConetns2";
 import DragAndDropContents from "./DragAndDropContents";
 import HintContent from "./HintContent";
 import { useNpcStore } from "@/stores/useNpcStore";
+import { useMCStore } from "@/stores/useMCStore";
 import { useCodingQuizStore } from "@/stores/useCodingQuizStore";
 
 export type DialogContentType = "multipleChoice" | "dragAndDrop";
@@ -46,10 +48,32 @@ export default class MiniGameDialog {
     null;
   private hintContent: HintContent | null = null;
 
-  private registry: Record<DialogContentType,() => { mount: () => void; unmount: () => void }> = {
-    multipleChoice: () => new MultipleChoiceContents(this.scene, this.mainRoot, this.getMainContentWidth(), (correct) => this.scene.events.emit("mcq-answered", correct)),
-    dragAndDrop: () => new DragAndDropContents(this.scene, this.mainRoot, this.getMainContentWidth()),
-    };
+  private registry: Record<
+    DialogContentType,
+    (payload?: any) => { mount: () => void; unmount: () => void }
+  > = {
+    // multipleChoice: () =>
+    //   new MultipleChoiceContents(
+    //     this.scene,
+    //     this.mainRoot,
+    //     this.getMainContentWidth(),
+    //     (correct) => this.scene.events.emit("mcq-answered", correct),
+    //   ),
+    multipleChoice: (payload) =>
+      new MultipleChoiceContents2(
+        this.scene,
+        this.mainRoot,
+        this.getMainContentWidth(),
+        (correct) => this.scene.events.emit("mcq-answered", correct),
+        payload.quiz
+      ),
+    dragAndDrop: () =>
+      new DragAndDropContents(
+        this.scene,
+        this.mainRoot,
+        this.getMainContentWidth()
+      ),
+  };
 
   constructor(
     scene: Phaser.Scene,
@@ -89,7 +113,7 @@ export default class MiniGameDialog {
     return this.open;
   }
 
-  show(type: DialogContentType) {
+  show(type: DialogContentType, payload?: any) {
     this.currentType = type;
 
     this.unmountAll();
@@ -98,15 +122,14 @@ export default class MiniGameDialog {
     if (!factory)
       throw new Error(`Dialog content type "${type}" not registered`);
 
-    // Mount left content
-    this.activeContent = factory();
+    this.activeContent = factory(payload);
     this.activeContent.mount();
 
     let hints: string[] = [];
+
     if (type === "multipleChoice") {
-      const { data } = useNpcStore.getState();
-      hints = data?.hints ?? [];
-    } else if (type === "dragAndDrop") {
+      hints = payload?.hints ?? [];
+    } else {
       const { data } = useCodingQuizStore.getState();
       hints = data?.hints ?? [];
     }
