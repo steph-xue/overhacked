@@ -1,6 +1,6 @@
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import mcq_router
+from app.routes import mcq_router, coding_quiz_router
 # Create FastAPI instance
 app = FastAPI()
 # Configure CORS
@@ -27,3 +27,4 @@ def root():
 
 # MCQ router
 app.include_router(mcq_router)
+app.include_router(coding_quiz_router)

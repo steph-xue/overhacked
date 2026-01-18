@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.schemas import MCQRequest, MCQResponse
 from dotenv import load_dotenv
 import os
