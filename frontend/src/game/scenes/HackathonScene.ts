@@ -305,32 +305,32 @@ export default class HackathonScene extends Phaser.Scene {
     // =========================
     this.npcs = [
       { sprite: this.spawnNpc(250, 300, "npc1"), game: "multipleChoice" },
-      { sprite: this.spawnNpc(800, 600, "npc2"), game: "multipleChoice" },
-      { sprite: this.spawnNpc(1250, 300, "npc3"), game: "dragAndDrop" },
-      { sprite: this.spawnNpc(200, 800, "npc4"), game: "dragAndDrop" },
+      { sprite: this.spawnNpc(800, 600, "npc2"), game: "dragAndDrop" },
+      { sprite: this.spawnNpc(1250, 300, "npc3"), game: "multipleChoice" },
+      { sprite: this.spawnNpc(200, 800, "npc4"), game: "multipleChoice" },
       { sprite: this.spawnNpc(1350, 730, "npc5"), game: "multipleChoice" },
     ];
 
     // FOR TESTING
     for (const npc of this.npcs) {
         const icon = this.add
-          .sprite(npc.x, npc.y, "npc-exclaim", 0)
+          .sprite(npc.sprite.x, npc.sprite.y, "npc-exclaim", 0)
           .setOrigin(0.5, 1)
           .setDepth(999)
           .setVisible(false);
       
         // Scale icon to match your world (NPCs are scale 6)
-        const SCALE_FACTOR = npc.scaleX * 0.75; // tweak: 0.6–1.0
+        const SCALE_FACTOR = npc.sprite.scaleX * 0.75; // tweak: 0.6–1.0
         icon.setDisplaySize(10 * SCALE_FACTOR, 10 * SCALE_FACTOR);
       
         icon.play("npc-exclaim-anim");
       
-        const HEAD_OFFSET = 6 * npc.scaleY;
-        const GAP = 8 * npc.scaleY;
+        const HEAD_OFFSET = 6 * npc.sprite.scaleY;
+        const GAP = 8 * npc.sprite.scaleY;
       
-        icon.setPosition(npc.x, npc.y - HEAD_OFFSET - GAP);
+        icon.setPosition(npc.sprite.x, npc.sprite.y - HEAD_OFFSET - GAP);
       
-        this.npcAlertIcon.set(npc, icon);
+        this.npcAlertIcon.set(npc.sprite, icon);
     }
 
     // Tiny collision boxes near NPC feet
@@ -522,17 +522,17 @@ export default class HackathonScene extends Phaser.Scene {
     // NPC alert markers
     // -------------------------
     for (const npc of this.npcs) {
-        const icon = this.npcAlertIcon.get(npc);
+        const icon = this.npcAlertIcon.get(npc.sprite);
         if (!icon) continue;
   
-    icon.setPosition(npc.x, npc.y - 160);
+    icon.setPosition(npc.sprite.x, npc.sprite.y - 160);
     }
 
     // Keep markers positioned above NPC heads
     for (const npc of this.npcs) {
-        const icon = this.npcAlertIcon.get(npc);
+        const icon = this.npcAlertIcon.get(npc.sprite);
         if (!icon) continue;
-        icon.setPosition(npc.x, npc.y - 160);
+        icon.setPosition(npc.sprite.x, npc.sprite.y - 160);
     }
   }
 
@@ -679,7 +679,7 @@ export default class HackathonScene extends Phaser.Scene {
   private pickRandomNpc(): Phaser.GameObjects.Sprite | null {
     if (!this.npcs.length) return null;
     const i = Phaser.Math.Between(0, this.npcs.length - 1);
-    return this.npcs[i];
+    return this.npcs[i].sprite;
   }
   
   private tryRandomNpcAlert() {
