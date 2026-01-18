@@ -20,6 +20,7 @@ export default function PhaserGame() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
+  // Create Phaser game (client-only)
   useEffect(() => {
     if (!containerRef.current) return;
     if (gameRef.current) return;
@@ -27,17 +28,21 @@ export default function PhaserGame() {
     let destroyed = false;
 
     (async () => {
-      const PhaserModule = await import("phaser");
+      const PhaserMod = await import("phaser");
+      const PhaserNS = (PhaserMod.default ?? PhaserMod) as typeof PhaserMod;
+
       if (destroyed || !containerRef.current) return;
 
-      const PhaserNS = PhaserModule as unknown as typeof PhaserModule;
+      // await the async config (SSR-safe)
+      const config = await createGameConfig(containerRef.current);
+      if (destroyed) return;
 
-      gameRef.current = new PhaserNS.Game(createGameConfig(containerRef.current));
+      gameRef.current = new PhaserNS.Game(config);
     })();
 
     return () => {
       destroyed = true;
-      gameRef.current?.destroy?.(true);
+      gameRef.current?.destroy(true);
       gameRef.current = null;
     };
   }, []);

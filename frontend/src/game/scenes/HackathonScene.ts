@@ -75,8 +75,10 @@ export default class HackathonScene extends Phaser.Scene {
   // Score board
   // =========================
   private scoreBoard!: ScoreBoard;
-  private completedChallenges = 0;
-  private readonly TOTAL_CHALLENGES = 3;
+  private progress = 0; 
+  private readonly MCQ_PROGRESS = 0.25;
+  private readonly DND_PROGRESS = 0.5;
+  
 
   // =========================
   // Game over/win dialogs
@@ -179,12 +181,14 @@ export default class HackathonScene extends Phaser.Scene {
     this.gameOver?.unmount();
     this.gameOver = undefined;
 
+    this.progress = 0;
     this.hasWon = false;
-    this.completedChallenges = 0;
+    
     this.npcFetchToken = 0;
 
     // IMPORTANT: prevent stacking listeners across restarts
     this.events.off("mcq-answered");
+    this.events.off("dnd-answered");
 
     // Ensure crisp pixel rendering
     this.textures.get("player").setFilter(Phaser.Textures.FilterMode.NEAREST);
@@ -313,32 +317,32 @@ export default class HackathonScene extends Phaser.Scene {
     // =========================
     this.npcs = [
       { sprite: this.spawnNpc(250, 300, "npc1"), game: "multipleChoice" },
-      { sprite: this.spawnNpc(800, 600, "npc2"), game: "multipleChoice" },
-      { sprite: this.spawnNpc(1250, 300, "npc3"), game: "dragAndDrop" },
-      { sprite: this.spawnNpc(200, 800, "npc4"), game: "dragAndDrop" },
+      { sprite: this.spawnNpc(800, 600, "npc2"), game: "dragAndDrop" },
+      { sprite: this.spawnNpc(1250, 300, "npc3"), game: "multipleChoice" },
+      { sprite: this.spawnNpc(200, 800, "npc4"), game: "multipleChoice" },
       { sprite: this.spawnNpc(1350, 730, "npc5"), game: "multipleChoice" },
     ];
 
     // FOR TESTING
     for (const npc of this.npcs) {
-      const icon = this.add
-        .sprite(npc.x, npc.y, "npc-exclaim", 0)
-        .setOrigin(0.5, 1)
-        .setDepth(999)
-        .setVisible(false);
-
-      // Scale icon to match your world (NPCs are scale 6)
-      const SCALE_FACTOR = npc.scaleX * 0.75; // tweak: 0.6–1.0
-      icon.setDisplaySize(10 * SCALE_FACTOR, 10 * SCALE_FACTOR);
-
-      icon.play("npc-exclaim-anim");
-
-      const HEAD_OFFSET = 6 * npc.scaleY;
-      const GAP = 8 * npc.scaleY;
-
-      icon.setPosition(npc.x, npc.y - HEAD_OFFSET - GAP);
-
-      this.npcAlertIcon.set(npc, icon);
+        const icon = this.add
+          .sprite(npc.sprite.x, npc.sprite.y, "npc-exclaim", 0)
+          .setOrigin(0.5, 1)
+          .setDepth(999)
+          .setVisible(false);
+      
+        // Scale icon to match your world (NPCs are scale 6)
+        const SCALE_FACTOR = npc.sprite.scaleX * 0.75; // tweak: 0.6–1.0
+        icon.setDisplaySize(10 * SCALE_FACTOR, 10 * SCALE_FACTOR);
+      
+        icon.play("npc-exclaim-anim");
+      
+        const HEAD_OFFSET = 6 * npc.sprite.scaleY;
+        const GAP = 8 * npc.sprite.scaleY;
+      
+        icon.setPosition(npc.sprite.x, npc.sprite.y - HEAD_OFFSET - GAP);
+      
+        this.npcAlertIcon.set(npc.sprite, icon);
     }
 
     // Tiny collision boxes near NPC feet
@@ -398,7 +402,7 @@ export default class HackathonScene extends Phaser.Scene {
     });
 
     // Start timer + progress
-    this.scoreBoard.start(180); // 3 minutes
+    this.scoreBoard.start(120); // 2 minutes
     this.scoreBoard.setProgress(0);
 
     // Drag-and-Drop
@@ -427,40 +431,50 @@ export default class HackathonScene extends Phaser.Scene {
       });
     });
 
+    // Add progress for multiple choice answers
     this.events.on("mcq-answered", (correct: boolean) => {
-      if (!correct) return;
+        if (!correct) return;
 
-      this.completedChallenges++;
+        this.addProgress(this.MCQ_PROGRESS);
+    });
 
-      this.scoreBoard.setProgressByCount(
-        this.completedChallenges,
-        this.TOTAL_CHALLENGES
-      );
+    // Add progress for drag and drop answers
+    this.events.off("dnd-answered");
+    this.events.on("dnd-answered", (correct: boolean) => {
+        if (!correct) return;
 
-      const progress = this.completedChallenges / this.TOTAL_CHALLENGES;
+        this.addProgress(this.DND_PROGRESS);
+    });
+  }
 
-      if (!this.hasWon && progress >= 1) {
+    // Add progress and check for win condition
+    private addProgress(delta: number) {
+        if (this.hasWon) return;
+
+    this.progress = Phaser.Math.Clamp(this.progress + delta, 0, 1);
+    this.scoreBoard.setProgress(this.progress);
+
+    if (this.progress >= 1) {
         this.hasWon = true;
 
         window.dispatchEvent(new CustomEvent("game-win"));
 
         this.winDialog = new WinningDialog(this);
         this.winDialog.mount({
-          onPlayAgain: () => {
+        onPlayAgain: () => {
             this.winDialog?.unmount();
             this.winDialog = undefined;
             this.hasWon = false;
             this.scene.restart();
-          },
-          onQuit: () => {
+        },
+        onQuit: () => {
             this.winDialog?.unmount();
             this.winDialog = undefined;
             this.hasWon = false;
             window.location.href = "/";
-          },
+        },
         });
       }
-    });
   }
 
   // =========================
@@ -531,17 +545,17 @@ export default class HackathonScene extends Phaser.Scene {
     // NPC alert markers
     // -------------------------
     for (const npc of this.npcs) {
-      const icon = this.npcAlertIcon.get(npc);
-      if (!icon) continue;
-
-      icon.setPosition(npc.x, npc.y - 160);
+        const icon = this.npcAlertIcon.get(npc.sprite);
+        if (!icon) continue;
+  
+    icon.setPosition(npc.sprite.x, npc.sprite.y - 160);
     }
 
     // Keep markers positioned above NPC heads
     for (const npc of this.npcs) {
-      const icon = this.npcAlertIcon.get(npc);
-      if (!icon) continue;
-      icon.setPosition(npc.x, npc.y - 160);
+        const icon = this.npcAlertIcon.get(npc.sprite);
+        if (!icon) continue;
+        icon.setPosition(npc.sprite.x, npc.sprite.y - 160);
     }
   }
 
@@ -693,7 +707,7 @@ export default class HackathonScene extends Phaser.Scene {
   private pickRandomNpc(): Phaser.GameObjects.Sprite | null {
     if (!this.npcs.length) return null;
     const i = Phaser.Math.Between(0, this.npcs.length - 1);
-    return this.npcs[i];
+    return this.npcs[i].sprite;
   }
 
   private tryRandomNpcAlert() {

@@ -1,9 +1,17 @@
-import * as Phaser from "phaser";
-import HackathonScene from "@/game/scenes/HackathonScene";
+import type Phaser from "phaser";
 
-export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameConfig {
+export async function createGameConfig(
+  parent: HTMLElement
+): Promise<Phaser.Types.Core.GameConfig> {
+  //  Load Phaser only in the browser
+  const PhaserMod = await import("phaser");
+  const PhaserNS = (PhaserMod.default ?? PhaserMod) as typeof PhaserMod;
+
+  // Load the scene only in the browser (prevents SSR "navigator" crash)
+  const { default: HackathonScene } = await import("@/game/scenes/HackathonScene");
+
   return {
-    type: Phaser.AUTO,
+    type: PhaserNS.AUTO,
     parent,
 
     width: 1500,
@@ -12,8 +20,8 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
     backgroundColor: "#000000",
 
     scale: {
-      mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
+      mode: PhaserNS.Scale.FIT,
+      autoCenter: PhaserNS.Scale.CENTER_BOTH,
     },
 
     physics: {
@@ -22,8 +30,8 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
     },
 
     render: {
-        pixelArt: true,
-        antialias: false,
+      pixelArt: true,
+      antialias: false,
     },
 
     scene: [HackathonScene],

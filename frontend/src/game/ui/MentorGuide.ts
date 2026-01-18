@@ -20,7 +20,7 @@ export default class MentorGuide {
     const { width, height } = s.scale;
 
     const W = Math.min(520, Math.floor(width * 0.42));
-    const H = 180;
+    const H = 200;
     const PAD = 12;
     const R = 14;
 
@@ -123,7 +123,7 @@ export default class MentorGuide {
     const H = 140;
 
     const x = width - W - margin;
-    const Y_OFFSET = 50; 
+    const Y_OFFSET = 60; 
     const y = height - H - margin - Y_OFFSET + (startOffscreen ? 16 : 0);
 
 
