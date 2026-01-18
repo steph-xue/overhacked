@@ -2,6 +2,7 @@ import * as Phaser from "phaser";
 import MiniGameDialog from "@/game/ui/MiniGameDialog";
 import { useNpcStore } from "@/stores/useNpcStore";
 import { useCodingQuizStore } from "@/stores/useCodingQuizStore";
+import { useDragDropStore } from "@/stores/useDragDropStore";
 import ScoreBoard from "@/game/ui/ScoreBoard";
 import GameOverDialog from "@/game/ui/GameOverDialog";
 import { use } from "react";
@@ -241,6 +242,9 @@ export default class HackathonScene extends Phaser.Scene {
     this.dialog = new MiniGameDialog(this, { bgHex: "#F3E9D9" });
     useNpcStore.getState().fetchNpcData();
     useCodingQuizStore.getState().fetchCodingQuiz();
+
+    // Drag-and-Drop
+    useDragDropStore.getState().fetchDragDropData();
   }
 
   // =========================

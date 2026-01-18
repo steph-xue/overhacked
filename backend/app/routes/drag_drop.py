@@ -51,7 +51,8 @@ async def ask_agent(request: DragDropGenerateRequest) -> DragDropQuestion:
         - question_type MUST be exactly "drag_drop"
         - question_mode MUST be exactly "reorder"
         - The player must reorder lines of a code-like snippet that demonstrates
-        OOP / design patterns / OOP-style reasoning (e.g., Strategy, Factory, composition, polymorphism) or LeetCode-style questions (Preferably, LeetCode Easy).
+        OOP / design patterns / OOP-style reasoning (e.g., Strategy, Factory, composition, polymorphism)/ LeetCode-style questions (Preferably, LeetCode Easy).
+        - Make sure that the LeetCode questions ARE LeetCode Easy level only.
         - Do NOT ask the player to write code from scratch. This is ONLY reordering provided lines.
         - items_to_drag must be SHUFFLED (not already in correct order).
         - drop_zones must be sequential position labels like ["1","2","3",...], matching the number of items.
@@ -73,14 +74,18 @@ async def ask_agent(request: DragDropGenerateRequest) -> DragDropQuestion:
     )
     
     drag_drop_hints_agent = Agent(
-        role=f"You are an expert in education and OOP and you'll provide hints to help {username} in case they struggle with the drag-and-drop exercise.",
-        goal="Provide hints to help the user understand if they are stalling for more than 30 seconds on a specific line.",
+        role=f"You are an expert in Computer Science education, and you'll provide hints to help {username} in case they struggle with the drag-and-drop exercise.",
+        goal="Provide hints to help the user understand the concepts behind the drag-and-drop question without giving away the answer directly.",
         backstory="You're an experienced educator in computer science. You excel at breaking down complex concepts into understandable hints.",
         llm=llm,
 
     )
     drag_drop_hints_task = Task(
-        description=f"Provide a series of hints to help {username} understand the concepts behind the drag-and-drop question. Start with lighter, more general hints, and gradually give more detailed or specific hints in later steps. Each hint should build on the previous ones and guide the user toward understanding without giving away the answer directly.",
+        description=f"""Provide a series of hints to help {username} understand the concepts behind the drag-and-drop question. 
+        Start with lighter, more general hints, and gradually give more detailed or specific hints in later steps. 
+        Each hint should build on the previous ones and guide the user toward understanding without giving away the answer directly.
+        Make sure that you are restricted to a maximum of 5 hints only.
+        Each hint should not exceed 40 characters in length.""",
         expected_output="""
         {
             "hints": string[]
