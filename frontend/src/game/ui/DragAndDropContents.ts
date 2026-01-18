@@ -6,7 +6,7 @@ export default class DragAndDropContents {
   private contentW: number;
 
   private objects: Phaser.GameObjects.GameObject[] = [];
-  private cardData: { label: string; rect: Phaser.GameObjects.Rectangle; labelObj: Phaser.GameObjects.Text; index: number }[] = [];
+  private cardData: { label: string; rect: Phaser.GameObjects.Rectangle; inDropZone: boolean }[] = [];
 
   constructor(scene: Phaser.Scene, root: Phaser.GameObjects.Container, contentW: number) {
     this.scene = scene;
@@ -20,14 +20,14 @@ export default class DragAndDropContents {
     // -------------------------
     // TITLE
     // -------------------------
-    const title = s.add.text(0, 0, "Coding Question", {
+    const title = s.add.text(0, 0, "Drag and Drop", {
       fontFamily: "Silkscreen",
       fontStyle: "bold",
       fontSize: "50px",
       color: "#4A3F35",
     });
 
-    const body = s.add.text(0, 80, "Drag the code pieces into correct order.", {
+    const body = s.add.text(0, 80, "Drag cards from top to bottom.", {
       fontFamily: "Silkscreen",
       fontSize: "24px",
       color: "#4A3F35",
@@ -39,19 +39,47 @@ export default class DragAndDropContents {
     this.objects.push(title, body);
 
     // -------------------------
+    // AREAS (vertical layout: top = start, bottom = destination)
+    // -------------------------
+    const areaX = 0;
+    const areaW = 1000;
+    const areaH = 300;
+    const areaGap = 30;
+
+    // Starting area (top)
+    const startX = 0;
+    const startY = 130;
+ 
+    // Destination area (bottom)
+    const destY = startY + areaH + areaGap;
+    const destArea = s.add
+      .rectangle(areaX, destY, areaW, areaH, 0x000000, 0.08)
+      .setOrigin(0, 0);
+
+    const destLabel = s.add.text(areaX + 15, destY + 10, "DROP HERE", {
+      fontFamily: "Silkscreen",
+      fontSize: "18px",
+      color: "#4A3F35",
+    }).setOrigin(0, 0);
+   
+    this.root.add(destArea);
+    this.root.add(destLabel);
+    this.objects.push(destArea, destLabel);
+
+    // -------------------------
     // SUBMIT BUTTON
     // -------------------------
-    const submitY = 800;
+    const submitY = destY + areaH + 30;
     const submitRect = s.add
-      .rectangle(400, submitY, 250, 80, 0x000000, 0.14)
+      .rectangle(areaW / 2, submitY, 250, 76, 0x000000, 0.14)
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
     const submitText = s.add
-      .text(400, submitY, "Submit", {
+      .text(areaW / 2, submitY, "Submit", {
         fontFamily: "Silkscreen",
         fontStyle: "bold",
-        fontSize: "20px",
+        fontSize: "28px",
         color: "#4A3F35",
       })
       .setOrigin(0.5);
@@ -65,7 +93,7 @@ export default class DragAndDropContents {
     this.objects.push(submitRect, submitText);
 
     // -------------------------
-    // CARDS
+    // CARDS (horizontal row in start area, drag vertically)
     // -------------------------
     const cards = [
       { label: "Array", color: 0x88cc88 },
@@ -75,11 +103,11 @@ export default class DragAndDropContents {
       { label: "Queue", color: 0xaa88cc },
     ];
 
-    const cardW = 800;
-    const cardH = 110;
+    const cardW = 1000;
+    const cardH = 50;
     const cardGap = 10;
-    const cardStartX = 0;
-    const cardStartY = 130;
+    const cardStartX = startX;
+    const cardStartY = startY;
 
     cards.forEach((card, i) => {
       const x = cardStartX;
@@ -92,23 +120,35 @@ export default class DragAndDropContents {
 
       const label = s.add.text(x + cardW / 2, y + cardH / 2, card.label, {
         fontFamily: "Silkscreen",
-        fontSize: "16px",
+        fontSize: "14px",
         color: "#000000",
       }).setOrigin(0.5);
 
       s.input.setDraggable(rect);
 
-      const cardInfo = { label: card.label, rect, labelObj: label, index: i };
+      const originalX = x;
+      const originalY = y;
+      const cardInfo = { label: card.label, rect, inDropZone: false };
       this.cardData.push(cardInfo);
 
       rect.on("drag", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-        rect.x = cardStartX;
+        // Only vertical movement
+        rect.x = originalX;
         rect.y = dragY;
-        label.setPosition(cardStartX + cardW / 2, dragY + cardH / 2);
+        label.setPosition(originalX + cardW / 2, dragY + cardH / 2);
       });
 
       rect.on("dragend", () => {
-        this.reorderCards(cardStartY, cardH, cardGap, cardStartX, cardW);
+        const cardCenterY = rect.y + cardH / 2;
+
+        if (cardCenterY > destY && cardCenterY < destY + areaH) {
+          cardInfo.inDropZone = true;
+        } else {
+          // Snap back to original position
+          rect.y = originalY;
+          label.setPosition(originalX + cardW / 2, originalY + cardH / 2);
+          cardInfo.inDropZone = false;
+        }
       });
 
       this.root.add(rect);
@@ -117,26 +157,28 @@ export default class DragAndDropContents {
     });
   }
 
-  private reorderCards(startY: number, cardH: number, cardGap: number, startX: number, cardW: number) {
-    // Sort by current Y position
-    this.cardData.sort((a, b) => a.rect.y - b.rect.y);
-
-    // Snap each card to its new slot
-    this.cardData.forEach((card, i) => {
-      const newY = startY + i * (cardH + cardGap);
-      card.rect.y = newY;
-      card.labelObj.setPosition(startX + cardW / 2, newY + cardH / 2);
-      card.index = i;
-    });
-  }
-
   getFinalOrder(): string[] {
-    return this.cardData.map(c => c.label);
+    // Returns cards in drop zone sorted by Y position (top to bottom)
+    const sorted = [...this.cardData]
+      .filter(c => c.inDropZone)
+      .sort((a, b) => a.rect.y - b.rect.y)
+      .map(c => c.label);
+    
+    return sorted;
   }
 
   private submit() {
     const finalOrder = this.getFinalOrder();
     console.log("Submitted order:", finalOrder);
+    
+    // You can add validation logic here
+    if (finalOrder.length === 0) {
+      console.log("No cards in drop zone!");
+    } else if (finalOrder.length < this.cardData.length) {
+      console.log("Not all cards placed!");
+    } else {
+      console.log("All cards submitted!");
+    }
   }
 
   unmount() {
