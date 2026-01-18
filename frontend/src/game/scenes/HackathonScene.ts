@@ -239,6 +239,34 @@ export default class HackathonScene extends Phaser.Scene {
     this.dialog = new MiniGameDialog(this, { bgHex: "#F3E9D9" });
     useNpcStore.getState().fetchNpcData();
     useCodingQuizStore.getState().fetchCodingQuiz();
+
+    // -------------------------
+    // ScoreBoard + GameOver
+    // -------------------------
+    this.scoreBoard = new ScoreBoard(this);
+    this.scoreBoard.mount({
+      onTimeUp: () => {
+        if (this.gameOver) return;
+
+        this.gameOver = new GameOverDialog(this);
+        this.gameOver.mount({
+          onRestart: () => {
+            this.gameOver?.unmount();
+            this.gameOver = undefined;
+            this.scene.restart();
+          },
+          onQuit: () => {
+            this.gameOver?.unmount();
+            this.gameOver = undefined;
+            window.location.href = "/"; // Next.js landing page
+          },
+        });
+      },
+    });
+
+    // Start timer + progress
+    this.scoreBoard.start(180); // 3 minutes
+    this.scoreBoard.setProgress(0.5);
   }
 
   // =========================

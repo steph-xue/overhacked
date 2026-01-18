@@ -4,8 +4,6 @@ import { useEffect, useRef } from "react";
 import type Phaser from "phaser";
 import { createGameConfig } from "@/game/config";
 
-import TimerUI from "./InGameTimer";
-
 export default function PhaserGame() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
@@ -43,7 +41,6 @@ export default function PhaserGame() {
 
       <div className="absolute top-5 right-10 z-50 pointer-events-none
              bg-black/60 px-3 py-1 rounded text-white text-md">
-        <TimerUI />
       </div>
 
     </div>

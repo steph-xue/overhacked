@@ -33,7 +33,7 @@ export default class ScoreBoard {
   private readonly X = 0; // tight to corner
   private readonly Y = 0;
 
-  private readonly BOX_W = 320;
+  private readonly BOX_W = 330;
   private readonly BOX_H = 48;
 
   private readonly BAR_W = 220;
@@ -57,7 +57,7 @@ export default class ScoreBoard {
 
     // Background (rounded)
     this.bg = s.add.graphics();
-    this.bg.fillStyle(0x614f3f, 1);
+    this.bg.fillStyle(0x917760, 1);
     this.bg.fillRoundedRect(0, 0, this.BOX_W, this.BOX_H, this.RADIUS);
 
     // Bar background (rounded)
@@ -175,7 +175,7 @@ export default class ScoreBoard {
     const fillW = Math.max(0, Math.floor(this.BAR_W * this.progress));
     const radius = Math.min(8, this.BAR_H / 2);
 
-    this.barFill.fillStyle(0x2e7d32, 1);
+    this.barFill.fillStyle(0x668c69, 1);
 
     // If fill is tiny, clamp radius so it doesn't look weird
     const r = Math.min(radius, Math.floor(fillW / 2));
