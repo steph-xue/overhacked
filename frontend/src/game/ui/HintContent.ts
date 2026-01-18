@@ -25,11 +25,13 @@ export default class HintContent {
     root: Phaser.GameObjects.Container;
     width: number;
     height: number;
+    hints?: string[];
   }) {
     this.scene = args.scene;
     this.root = args.root;
     this.width = args.width;
     this.height = args.height;
+    this.hints = args.hints ?? [];
   }
 
   mount() {
@@ -113,9 +115,6 @@ export default class HintContent {
 
     const imgScale = Math.min(maxImgW / fw, maxImgH / fh);
     mentorSprite.setScale(imgScale);
-
-    const { hints } = data;
-    this.hints = hints.length > 0 ? hints : this.hints;
 
     // Click prompt underneath mentor
     const clickPrompt = s.add
