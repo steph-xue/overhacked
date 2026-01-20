@@ -147,7 +147,7 @@ The aim of the game for Overhacked! is simple: fill the progress bar by answerin
 ### Victory Dialog
 - Triggered when the player fills the progress bar before the time limit.
 - Displays a celebratory congratulations message.
-- Includes a confetti animation to reward the player for winning the hackathon.
+- Includes a confetti animation to reward the player for winning the hackathon challenge.
 <p align="center">
   <img src="frontend/public/screenshots/win.png" alt="win" height="500"/>
 </p>
