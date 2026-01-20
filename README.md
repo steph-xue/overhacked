@@ -6,14 +6,14 @@
   A cozy hackathon game where you talk to teammates, solve coding challenges, and race the clock to win together!
 </h2>
 
+---
+
 <h3>NWHacks 2026</h3>
 Devpost link: https://devpost.com/software/overhacked
-<br>
-<br>
+
+---
 
 https://github.com/user-attachments/assets/2e9fa9cf-fa4e-4b84-a2d3-502f0107b06f
-
-<br>
   
 <br>
 
@@ -29,10 +29,136 @@ The aim of the game for Overhacked! is simple: fill the progress bar by answerin
 
 ## Features
 
-### Landing Screen
-- Welcomes the user to the application
+### Landing Page
+- Serves as the entry point to the game.
+- Designed with a clean, simple UI to quickly guide users into gameplay.
 <p align="center">
-  <img src="assets/screenshots/landing-page.jpg" alt="landing" height="500"/>
+  <img src="frontend/public/screenshots/landing-page.png" alt="landing" height="400"/>
+</p>
+
+---
+
+### User Form
+- Players can enter the following information into the user form for personalized minigame questions:
+  - Username, which appears above their player character in-game.
+  - Years of programming experience, which the agentic AI uses to dynamically adjust question difficulty.
+  - Favourite programming language, for personalized quiz generation.
+- This information is passed to the backend to power adaptive gameplay.
+<p align="center">
+  <img src="frontend/public/screenshots/user-form.png" alt="user-form" height="400"/>
+</p>
+
+---
+
+### Game Scene
+- Features a top-down 2D hackathon room built with Phaser.js.
+- Plays cute retro video game music upon entering the scene.
+- Player can move freely in all four directions using the arrow keys.
+- The player’s username is displayed above their character for personalization.
+- Includes collision handling for tables and walls, requiring players to navigate the room realistically.
+- A mentor instruction popup appears at the bottom right when the scene loads, explaining the game objective:
+  - Talk to teammates to help them with coding problems and fill the progress bar before time runs out!
+- A 2-minute countdown timer and **progress bar are displayed at the top left.
+  - The progress bar fills up green as questions are answered correctly.
+- Teammates are placed throughout the game scene. When the player walks near one, a prompt appears letting them press E to interact and launch an object oriented programming (OOP) themed minigame. The two available minigames are:
+  - Multiple Choice
+  - Drag and Drop
+<table align="center">
+  <tr>
+    <td>
+      <img src="frontend/public/screenshots/game-scene.png" alt="game" width="500"/>
+    </td>
+    <td>
+      <img src="frontend/public/screenshots/talk-with-team.png" alt="talk-with-team" width="500"/>
+    </td>
+  </tr>
+</table>
+
+---
+
+### Mentor Popup Alerts
+- Mentor alerts appear randomly throughout gameplay at the bottom right.
+- These alerts provide guidance, encouragement, or hints when players may be stuck.
+- Adds a layer of realism and support, simulating mentor check-ins during a real hackathon.
+<p align="center">
+  <img src="frontend/public/screenshots/mentor-popup.png" alt="mentor-popup" height="500"/>
+</p>
+
+---
+
+### Minigame – Multiple Choice
+- Displays a loading screen while the agentic AI generates a personalized question.
+- Presents object oriented programming (OOP) themed multiple-choice coding questions.
+- Each correct answer increases progress by 25%.
+- Visual feedback is provided after submission:
+  - Correct answers are highlighted in green.
+  - Incorrect answers are highlighted in red.
+- A mentor character on the right side is clickable and provides contextual hints.
+- Both the questions and hints are generated dynamically by AI agents.
+<table align="center">
+  <tr>
+    <td>
+      <img src="frontend/public/screenshots/mutiple-choice1.png" alt="mutiple-choice1" width="500"/>
+    </td>
+    <td>
+      <img src="frontend/public/screenshots/multiple-choice1-incorrect.png" alt="multiple-choice1-incorrect" width="500"/>
+    </td>
+  </tr>
+</table>
+<table align="center">
+  <tr>
+    <td>
+      <img src="frontend/public/screenshots/mutiple-choice2.png" alt="mutiple-choice2" width="500"/>
+    </td>
+    <td>
+      <img src="frontend/public/screenshots/multiple-choice2-correct.png" alt="multiple-choice2-correct" width="500"/>
+    </td>
+  </tr>
+</table>
+
+---
+
+### Minigame – Drag and Drop
+- Displays a loading screen while the agentic AI generates a personalized question.
+- Presents object oriented programming (OOP) themed drag and drop questions, which is a more challenging, interactive minigame focused on code structure.
+- Players must drag and drop lines of code into the correct order.
+- Correctly completing this minigame increases progress by 50%.
+- Visual feedback is provided after submission:
+  - Correct solutions are highlighted in green.
+  - Incorrect solutions are highlighted in red.
+- A mentor character on the right side is clickable and provides contextual hints.
+- Both the questions and hints are generated dynamically by AI agents.
+<p align="center">
+  <img src="frontend/public/screenshots/drag-and-drop.png" alt="drag-and-drop" height="400"/>
+</p>
+<table align="center">
+  <tr>
+    <td>
+      <img src="frontend/public/screenshots/drag-and-drop-correct.png" alt="drag-and-drop-correct" width="500"/>
+    </td>
+    <td>
+      <img src="frontend/public/screenshots/drag-and-drop-incorrect.png" alt="drag-and-drop-incorrect" width="500"/>
+    </td>
+  </tr>
+</table>
+
+---
+
+### Victory Dialog
+- Triggered when the player fills the progress bar before the time limit.
+- Displays a celebratory congratulations message.
+- Includes a confetti animation to reward the player for winning the hackathon.
+<p align="center">
+  <img src="frontend/public/screenshots/win.png" alt="win" height="500"/>
+</p>
+
+---
+
+### Game Over Dialog
+- Triggered when the 2-minute timer runs out before the progress bar is filled.
+- Displays a game-over screen to indicate the hackathon challenge was not completed in time.
+<p align="center">
+  <img src="frontend/public/screenshots/game-over.png" alt="game-over" height="500"/>
 </p>
 
 
