@@ -58,7 +58,7 @@ The aim of the game for Overhacked! is simple: fill the progress bar by answerin
 - Includes collision handling for tables and walls, requiring players to navigate the room realistically.
 - A mentor instruction popup appears at the bottom right when the scene loads, explaining the game objective:
   - Talk to teammates to help them with coding problems and fill the progress bar before time runs out!
-- A 2-minute countdown timer and **progress bar are displayed at the top left.
+- A 2-minute countdown timer and progress bar are displayed at the top left.
   - The progress bar fills up green as questions are answered correctly.
 - Teammates are placed throughout the game scene. When the player walks near one, a prompt appears letting them press E to interact and launch an object oriented programming (OOP) themed minigame. The two available minigames are:
   - Multiple Choice
