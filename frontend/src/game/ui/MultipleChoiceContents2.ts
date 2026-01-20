@@ -73,7 +73,7 @@ export default class MultipleChoiceContents2 {
 
     // const { question, choices, answer } = questionData;
     const { question, choices, answer } = this.quiz;
-    this.correctIndex = Phaser.Math.Clamp(answer - 1, 0, choices.length - 1);
+    this.correctIndex = Phaser.Math.Clamp(answer, 0, choices.length - 1);
 
     // -------------------------
     // QUESTION TITLE + TEXT

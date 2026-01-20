@@ -1,7 +1,7 @@
 // src/game/ui/Dialog.ts
 import * as Phaser from "phaser";
 import MultipleChoiceContents from "./MultipleChoiceContents";
-import MultipleChoiceContents2 from "./MutipleChoiceConetns2";
+import MultipleChoiceContents2 from "./MultipleChoiceContents2";
 import DragAndDropContents from "./DragAndDropContents";
 import HintContent from "./HintContent";
 import { useNpcStore } from "@/stores/useNpcStore";
