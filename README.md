@@ -39,10 +39,10 @@ The aim of the game for Overhacked! is simple: fill the progress bar by answerin
 ---
 
 ### User Form
-- Players can enter the following information into the user form for personalized minigame questions:
-  - Username, which appears above their player character in-game.
-  - Years of programming experience, which the agentic AI uses to dynamically adjust question difficulty.
-  - Favourite programming language, for personalized quiz generation.
+- Players can fill out the user form with the following details:
+  - Username displayed above their player character in-game.
+  - Years of programming experience used by the agentic AI to adjust question difficulty.
+  - Favourite programming language used to tailor quiz generation.
 - This information is passed to the backend to power adaptive gameplay.
 <p align="center">
   <img src="frontend/public/screenshots/user-form.png" alt="user-form" height="400"/>
