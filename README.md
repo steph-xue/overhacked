@@ -81,7 +81,7 @@ The aim of the game for Overhacked! is simple: fill the progress bar by answerin
 - These alerts provide guidance, encouragement, or hints when players may be stuck.
 - Adds a layer of realism and support, simulating mentor check-ins during a real hackathon.
 <p align="center">
-  <img src="frontend/public/screenshots/mentor-popup.png" alt="mentor-popup" height="500"/>
+  <img src="frontend/public/screenshots/mentor-popup.png" alt="mentor-popup" height="400"/>
 </p>
 
 ---
