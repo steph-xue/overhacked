@@ -169,7 +169,7 @@ Overhacked!was built using the following tech stack:
 
 - **Phaser.js (Game engine):** A new tool for all members of our team, used to build the core game mechanics, scenes, player movement, and interactions.
 - **Next.js, React.js, and TypeScript (Frontend & UI):** Next.js served as the framework for structuring the application, while React.js and TypeScript were used to build UI components and ensure type safety. This stack was utilized by many of our members previously in prior personal and hackathon projects, making it the ideal frontend tool for rapid development.
-- **OpenAI + CrewAI (Agentic AI integration): We leveraged OpenAI’s large language models (LLMs) to generate dynamic content for our games, such as quiz questions and hints. CrewAI was used to create specialized AI agents for each mini-game. These agents serve two main purposes:
+- **OpenAI + CrewAI (Agentic AI integration):** We leveraged OpenAI’s large language models (LLMs) to generate dynamic content for our games, such as quiz questions and hints. CrewAI was used to create specialized AI agents for each mini-game. These agents serve two main purposes:
   - **Quiz Creator Agents:** Generate personalized quizzes based on the player's experience level and preferred programming language to adapt the mini-games to the player's level of skill.
   - **Hint Agents:** Provide contextual hints for each question, helping players understand concepts without giving away the answers directly.
 - **FastAPI + Python (Backend API endpoints):** Used to handle backend logic and API communication, including GET and POST requests for returning prompted questions.
