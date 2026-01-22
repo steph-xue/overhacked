@@ -8,7 +8,7 @@
 
 ---
 
-<h3>NWHacks 2026</h3>
+<h3>nwHacks 2026</h3>
 Devpost link: https://devpost.com/software/overhacked
 
 ---
