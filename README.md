@@ -18,7 +18,7 @@ https://github.com/user-attachments/assets/2e9fa9cf-fa4e-4b84-a2d3-502f0107b06f
 <br>
 
 ## Inspiration
-As CS students, attending hackathons is one of our favourite ways to meet new people, find like-minded collaborators, and bring a shippable MVP to life. That said, you might end up meeting some people who are a bit too preoccupied with other priorities, like studying, grinding LeetCode, or applying for internships (which, to be fair, is completely valid). With this in mind, we wanted to create a game that not only mimics a chaotic energy of a hackathon environment, but also gives players a fun way to brush up on their programming knowledge through a variety of mini-games. From object oriented programming (OOP) multiple-choice questions to interactive drag-and-drop challenges, Overhacked! has you covered.
+As CS students, attending hackathons is one of our favourite ways to meet new people, find like-minded collaborators, and bring a shippable MVP to life. That being said, you might end up meeting some people who are a bit too preoccupied with other priorities, like studying, grinding LeetCode, or applying for internships (which, to be fair, is completely valid). Inspired by the fast-paced gameplay of Overcooked where players race against the clock to complete as many dishes as possible, we wanted to capture the same gameplay in a hackathon-themed experience. We wanted to create a game that not only mimics a chaotic energy of a hackathon environment, but also gives players a fun way to brush up on their programming knowledge through a variety of mini-games. From object oriented programming (OOP) multiple-choice questions to interactive drag-and-drop challenges, Overhacked! has you covered.
 
 <br>
 
@@ -40,9 +40,9 @@ The aim of the game for Overhacked! is simple: fill the progress bar by answerin
 
 ### User Form
 - Players can fill out the user form with the following details:
-  - Username displayed above their player character in-game.
-  - Years of programming experience used by the agentic AI to adjust question difficulty.
-  - Favourite programming language used to tailor quiz generation.
+  - Username - displayed above the player's character in-game.
+  - Years of programming experience - used by the agentic AI to adjust minigame question difficulty.
+  - Favourite programming language - used to tailor minigame question generation.
 - This information is passed to the backend to power adaptive gameplay.
 <p align="center">
   <img src="frontend/public/screenshots/user-form.png" alt="user-form" height="400"/>
@@ -51,12 +51,12 @@ The aim of the game for Overhacked! is simple: fill the progress bar by answerin
 ---
 
 ### Game Scene
-- Features a top-down 2D hackathon room built with Phaser.js.
+- Features a top-down 2D hackathon room map.
 - Plays cute retro video game music upon entering the scene.
-- Player can move freely in all four directions using the arrow keys.
-- The player’s username is displayed above their character for personalization.
+- The player can move freely in all four directions using the arrow keys.
 - Includes collision handling for tables and walls, requiring players to navigate the room realistically.
-- A mentor instruction popup appears at the bottom right when the scene loads, explaining the game objective:
+- The player’s username is displayed above their character for personalization.
+- A mentor instruction popup appears at the bottom right when the scene loads, explaining the objective of the game:
   - Talk to teammates to help them with coding problems and fill the progress bar before time runs out!
 - A 2-minute countdown timer and progress bar are displayed at the top left.
   - The progress bar fills up green as questions are answered correctly.
@@ -145,7 +145,7 @@ The aim of the game for Overhacked! is simple: fill the progress bar by answerin
 ---
 
 ### Victory Dialog
-- Triggered when the player fills the progress bar before the time limit.
+- Triggered when the player fills the progress bar before the 2-minute time limit.
 - Displays a celebratory congratulations message.
 - Includes a confetti animation to reward the player for winning the hackathon challenge.
 <p align="center">
@@ -203,3 +203,75 @@ More animated elements to the UI to add greater engagement for the player!
 <br>
 
 ## How to Run Locally (Frontend & Backend)
+
+### 1. Prerequisites
+Make sure you have the following installed:
+- **Node.js (v18 or later)**: Used for running the Next.js frontend and managing JavaScript dependencies. Check the Node.js version using:
+  ```bash
+  node --version
+  ```
+- **Python (3.10 or later)**: Required for running the FastAPI backend and AI agents. Check the Python version using:
+  ```bash
+  python --version
+  ```
+- **Git**: Used to clone the repository. Check the Git version using:
+  ```bash
+  git --version
+  ```
+
+### 2. Clone the repository
+Clone the repository and navigate into the project root directory by running:
+```bash
+git clone https://github.com/steph-xue/overhacked.git
+cd overrhacked
+```
+
+### 3. Install frontend dependencies
+From the project root, navigate to the frontend directory and install the dependencies using:
+```bash
+cd frontend
+npm install
+```
+
+### 4. Start the frontend development server
+Use the command:
+```bash
+npm run dev
+```
+Once started, the frontend will be available at:
+```bash
+http://localhost:3000
+```
+
+### 5. Navigate to the backend directory
+From the project root, navigate to the backend directory by running:
+```bash
+cd backend
+```
+
+### 6. Virtual environment
+Create and activate a Python virtual environment using:
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux / macOS
+venv\Scripts\activate     # Windows
+```
+
+### 7. Install backend dependencies
+Install all required Python packages by running:
+```bash
+pip install -r requirements.txt
+```
+
+### 8. Set backend environment variables
+Create a .env file in the backend directory and add in the following:
+```bash
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+### 5. Run the backend server
+Launch the FastAPI backend server using Uvicorn using:
+```bash
+uvicorn main:app --reload  --port 8000
+```
+The server will start at: http://127.0.0.1:8000
