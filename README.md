@@ -165,7 +165,7 @@ The aim of the game for Overhacked! is simple: fill the progress bar by answerin
 <br>
 
 ## How We Built It
-Overhacked was built using the following tech stack:
+Overhacked!was built using the following tech stack:
 
 - **Phaser.js (Game engine):** A new tool for all members of our team, used to build the core game mechanics, scenes, player movement, and interactions.
 - **Next.js, React.js, and TypeScript (Frontend & UI):** Next.js served as the framework for structuring the application, while React.js and TypeScript were used to build UI components and ensure type safety. This stack was utilized by many of our members previously in prior personal and hackathon projects, making it the ideal frontend tool for rapid development.
