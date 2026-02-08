@@ -98,20 +98,20 @@ The aim of the game for Overhacked! is simple: fill the progress bar by answerin
 <table align="center">
   <tr>
     <td>
-      <img src="frontend/public/screenshots/mutiple-choice1.png" alt="mutiple-choice1" width="500"/>
+      <img src="frontend/public/screenshots/multiple-choice1.png" alt="multiple-choice1" width="500"/>
     </td>
     <td>
-      <img src="frontend/public/screenshots/multiple-choice1-incorrect.png" alt="multiple-choice1-incorrect" width="500"/>
+      <img src="frontend/public/screenshots/multiple-choice1-correct.png" alt="multiple-choice1-correct" width="500"/>
     </td>
   </tr>
 </table>
 <table align="center">
   <tr>
     <td>
-      <img src="frontend/public/screenshots/mutiple-choice2.png" alt="mutiple-choice2" width="500"/>
+      <img src="frontend/public/screenshots/multiple-choice2.png" alt="multiple-choice2" width="500"/>
     </td>
     <td>
-      <img src="frontend/public/screenshots/multiple-choice2-correct.png" alt="multiple-choice2-correct" width="500"/>
+      <img src="frontend/public/screenshots/multiple-choice2-incorrect.png" alt="multiple-choice2-incorrect" width="500"/>
     </td>
   </tr>
 </table>
