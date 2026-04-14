@@ -1,17 +1,14 @@
-<h1 align="center">
-  Overhacked!
-</h1>
+<h1 align="center">Overhacked!</h1>
+<h2 align="center">(nwHacks 2026)</h2>
 
 <h2 align="center">
-  A cozy hackathon game where you talk to teammates, solve coding challenges, and race the clock to win together!
+  A cozy hackathon game where you talk to teammates, solve coding challenges,<br>
+  and race the clock to win together!
 </h2>
 
----
-
-<h3>NWHacks 2026</h3>
-Devpost link: https://devpost.com/software/overhacked
-
----
+<p align="center">
+  Devpost link: <a href="https://devpost.com/software/overhacked">https://devpost.com/software/overhacked</a>
+</p>
 
 https://github.com/user-attachments/assets/2e9fa9cf-fa4e-4b84-a2d3-502f0107b06f
   
