@@ -1,274 +1,309 @@
 <h1 align="center">Overhacked!</h1>
 <h2 align="center">(nwHacks 2026)</h2>
 
-<h2 align="center">
+<h4 align="center">
   A cozy hackathon game where you talk to teammates,<br>
-  solve coding challenges and race the clock to win together!
-</h2>
+  solve coding challenges, and race the clock to win together!
+</h4>
 
 <p align="center">
-  Devpost link: <a href="https://devpost.com/software/overhacked">https://devpost.com/software/overhacked</a>
+  <video src="https://github.com/user-attachments/assets/2e9fa9cf-fa4e-4b84-a2d3-502f0107b06f" width="500" style="max-width:500px;" controls></video>
 </p>
 
-https://github.com/user-attachments/assets/2e9fa9cf-fa4e-4b84-a2d3-502f0107b06f
-  
-<br>
-
-## Inspiration
-As CS students, attending hackathons is one of our favourite ways to meet new people, find like-minded collaborators, and bring a shippable MVP to life. That being said, you might end up meeting some people who are a bit too preoccupied with other priorities, like studying, grinding LeetCode, or applying for internships (which, to be fair, is completely valid). Inspired by the fast-paced gameplay of Overcooked where players race against the clock to complete as many dishes as possible, we wanted to capture the same gameplay in a hackathon-themed experience. We wanted to create a game that not only mimics a chaotic energy of a hackathon environment, but also gives players a fun way to brush up on their programming knowledge through a variety of mini-games. From object oriented programming (OOP) multiple-choice questions to interactive drag-and-drop challenges, Overhacked! has you covered.
+<p align="center">
+  <a href="https://devpost.com/software/overhacked">Devpost</a>
+</p>
 
 <br>
 
-## What It Does
-The aim of the game for Overhacked! is simple: fill the progress bar by answering your fellow teammates' questions as quickly as possible. Each correct answer adds to your progress bar. Multiple choice questions will fill the progress bar by 25%, while the more challenging drag and drop questions will fill it by 50%. Players win by completely filling the progress bar, which triggers a congratulatory message and celebratory confetti animation to signify that “your MVP was fully shipped.” If time runs out before the bar is filled, the game will end with a game over dialog. While the demo features a 2-minute round, we eventually hope to expand the gameplay longer so that covers more concepts like full-stack development (frontend and backend), data structures and algorithms, systems design and many more. We would also like to include tailored feedback to help players identify areas for improvement. See below for planned future improvements!
+## Table of Contents
+- [Contributors](#contributors)
+- [Problem Statement](#problem-statement)
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [How It Works](#how-it-works)
+- [Technical Challenges](#technical-challenges)
+- [Achievements](#achievements)
+- [Future Improvements](#future-improvements)
+- [Getting Started](#getting-started)
+
+<br>
+
+## Contributors
+- Rain Lin
+- Sam Lui
+- Stephanie Xue
+- Yuko Murayama
+
+<br>
+
+## Problem Statement
+
+As CS students, attending hackathons is one of our favourite ways to meet new people, find like-minded collaborators, and bring a shippable MVP to life. That being said, you might end up meeting some people who are a bit too preoccupied with other priorities, like studying, grinding LeetCode, or applying for internships, which, to be fair, is completely valid. Inspired by the fast-paced gameplay of Overcooked, where players race against the clock to complete as many dishes as possible, we wanted to capture that same energy in a hackathon-themed experience. We wanted to create a game that not only mimics the chaotic energy of a hackathon environment, but also gives players a fun way to brush up on their programming knowledge through a variety of mini-games. From object oriented programming multiple-choice questions to interactive drag-and-drop challenges, Overhacked! has you covered.
+
+<br>
+
+## Overview
+
+This project is a 2D pixel art game where players answer programming questions from their teammates to fill a progress bar before a two-minute timer runs out. Questions come in two main formats, multiple choice and drag and drop, both powered and personalized by agentic AI workflows based on information the player enters into a form at the start of the game. Multiple-choice questions are trivia style and test object oriented programming concepts without requiring the player to write any code, and answering correctly increases the progress bar by 25%. Drag-and-drop questions are hands-on code structuring exercises that also test object oriented programming concepts, and completing one correctly increases the bar by 50%. Players win by filling the progress bar before time runs out. The game is built with Next.js, React, TypeScript, and Tailwind CSS on the frontend, with Phaser.js serving as the game engine that powers scenes, player movement, and interactions. The backend uses FastAPI and Python, with OpenAI and CrewAI powering the agentic AI workflow that generates the personalized minigame questions and hints. The Zustand library manages state across the game's stores, and React Confetti renders a falling confetti animation when a player completes the game.
 
 <br>
 
 ## Features
 
 ### Landing Page
-- Serves as the entry point to the game.
-- Designed with a clean, simple UI to quickly guide users into gameplay.
+Serves as the entry point to the game, designed with a clean, simple UI to quickly guide users into gameplay.
+
 <p align="center">
-  <img src="frontend/public/screenshots/landing-page.png" alt="landing" height="400"/>
+  <img src="frontend/public/screenshots/landing-page.png" alt="landing" width="500"/>
 </p>
 
----
+<br>
 
 ### User Form
-- Players can fill out the user form with the following details:
-  - Username - displayed above the player's character in-game.
-  - Years of programming experience - used by the agentic AI to adjust minigame question difficulty.
-  - Favourite programming language - used to tailor minigame question generation.
-- This information is passed to the backend to power adaptive gameplay.
+Before entering the game, players fill out a form with the following information, which is passed to the backend to power adaptive gameplay:
+- **Username**, displayed above the player's character in-game
+- **Years of programming experience**, used by the agentic AI to adjust minigame question difficulty
+- **Favourite programming language**, used to tailor minigame question generation
+
 <p align="center">
-  <img src="frontend/public/screenshots/user-form.png" alt="user-form" height="400"/>
+  <img src="frontend/public/screenshots/user-form.png" alt="user-form" width="500"/>
 </p>
 
----
+<br>
 
 ### Game Scene
-- Features a top-down 2D hackathon room map.
-- Plays cute retro video game music upon entering the scene.
-- The player can move freely in all four directions using the arrow keys.
-- Includes collision handling for tables and walls, requiring players to navigate the room realistically.
-- The player’s username is displayed above their character for personalization.
-- A mentor instruction popup appears at the bottom right when the scene loads, explaining the objective of the game:
-  - Talk to teammates to help them with coding problems and fill the progress bar before time runs out!
-- A 2-minute countdown timer and progress bar are displayed at the top left.
-  - The progress bar fills up green as questions are answered correctly.
-- Teammates are placed throughout the game scene. When the player walks near one, a prompt appears letting them press E to interact and launch an object oriented programming (OOP) themed minigame. The two available minigames are:
-  - Multiple Choice
-  - Drag and Drop
+The game takes place on a top-down 2D hackathon room, brought to life through a custom rendered pixel art background. Cute retro video game music loops continuously from the moment the scene loads.
+
+- **Objective:**
+  - A mentor instruction popup appears at the bottom right when the scene loads, explaining the objective: talk to teammates to help them with coding problems and fill the progress bar before time runs out
+  - A two-minute countdown timer and progress bar are displayed at the top left, with the bar filling green as questions are answered correctly
+- **Movement:**
+  - The player's username is displayed above their character for personalization
+  - Players move freely in all four directions using the arrow keys
+  - Collision handling for tables and walls requires realistic navigation of the room
+- **Teammate Interaction:**
+  - Teammates are placed throughout the scene
+  - Walking near a teammate brings up a prompt to press E and launch that teammate's assigned minigame, either multiple choice or drag-and-drop
+
 <table align="center">
   <tr>
     <td>
-      <img src="frontend/public/screenshots/game-scene.png" alt="game" width="500"/>
+      <img src="frontend/public/screenshots/game-scene.png" alt="game" width="450"/>
     </td>
     <td>
-      <img src="frontend/public/screenshots/talk-with-team.png" alt="talk-with-team" width="500"/>
+      <img src="frontend/public/screenshots/talk-with-team.png" alt="talk-with-team" width="450"/>
     </td>
   </tr>
 </table>
 
----
+<br>
 
 ### Mentor Popup Alerts
-- Mentor alerts appear randomly throughout gameplay at the bottom right.
-- These alerts provide guidance, encouragement, or hints when players may be stuck.
-- Adds a layer of realism and support, simulating mentor check-ins during a real hackathon.
+Mentor alerts appear randomly throughout gameplay at the bottom right, providing guidance, encouragement, or hints when players may be stuck. This adds a layer of realism and support, simulating mentor check-ins during a real hackathon.
+
 <p align="center">
-  <img src="frontend/public/screenshots/mentor-popup.png" alt="mentor-popup" height="400"/>
+  <img src="frontend/public/screenshots/mentor-popup.png" alt="mentor-popup" width="500"/>
 </p>
 
----
+<br>
 
-### Minigame – Multiple Choice
-- Displays a loading screen while the agentic AI generates a personalized question.
-- Presents object oriented programming (OOP) themed multiple-choice coding questions.
-- Each correct answer increases progress by 25%.
-- Visual feedback is provided after submission:
-  - Correct answers are highlighted in green.
-  - Incorrect answers are highlighted in red.
-- A mentor character on the right side is clickable and provides contextual hints.
-- Both the questions and hints are generated dynamically by AI agents.
+### Minigames
+Both minigames follow a consistent structure. A loading screen appears while the agentic AI generates a personalized question, and a clickable mentor character remains available throughout to offer contextual hints. Every submitted answer is evaluated immediately, with correct responses highlighted in green and incorrect ones in red. The two minigames differ primarily in question format and in how much each contributes to the overall progress bar.
+
+**Multiple Choice**
+- Trivia style question testing object oriented programming concepts
+- Answering correctly increases progress by 25%
+
 <table align="center">
   <tr>
     <td>
-      <img src="frontend/public/screenshots/multiple-choice1.png" alt="multiple-choice1" width="500"/>
+      <img src="frontend/public/screenshots/multiple-choice1.png" alt="multiple-choice1" width="450"/>
     </td>
     <td>
-      <img src="frontend/public/screenshots/multiple-choice1-correct.png" alt="multiple-choice1-correct" width="500"/>
+      <img src="frontend/public/screenshots/multiple-choice1-correct.png" alt="multiple-choice1-correct" width="450"/>
     </td>
   </tr>
 </table>
 <table align="center">
   <tr>
     <td>
-      <img src="frontend/public/screenshots/multiple-choice2.png" alt="multiple-choice2" width="500"/>
+      <img src="frontend/public/screenshots/multiple-choice2.png" alt="multiple-choice2" width="450"/>
     </td>
     <td>
-      <img src="frontend/public/screenshots/multiple-choice2-incorrect.png" alt="multiple-choice2-incorrect" width="500"/>
+      <img src="frontend/public/screenshots/multiple-choice2-incorrect.png" alt="multiple-choice2-incorrect" width="450"/>
     </td>
   </tr>
 </table>
 
----
+<br>
 
-### Minigame – Drag and Drop
-- Displays a loading screen while the agentic AI generates a personalized question.
-- Presents object oriented programming (OOP) themed drag and drop questions, which is a more challenging, interactive minigame focused on code structure.
-- Players must drag and drop lines of code into the correct order.
-- Correctly completing this minigame increases progress by 50%.
-- Visual feedback is provided after submission:
-  - Correct solutions are highlighted in green.
-  - Incorrect solutions are highlighted in red.
-- A mentor character on the right side is clickable and provides contextual hints.
-- Both the questions and hints are generated dynamically by AI agents.
+**Drag and Drop**
+- A more challenging, hands-on code structuring exercise requiring the player to arrange lines of code correctly, testing object oriented programming concepts
+- Completing one correctly increases progress by 50%
+
 <p align="center">
-  <img src="frontend/public/screenshots/drag-and-drop.png" alt="drag-and-drop" height="400"/>
+  <img src="frontend/public/screenshots/drag-and-drop.png" alt="drag-and-drop" height="300"/>
 </p>
 <table align="center">
   <tr>
     <td>
-      <img src="frontend/public/screenshots/drag-and-drop-correct.png" alt="drag-and-drop-correct" width="500"/>
+      <img src="frontend/public/screenshots/drag-and-drop-correct.png" alt="drag-and-drop-correct" width="450"/>
     </td>
     <td>
-      <img src="frontend/public/screenshots/drag-and-drop-incorrect.png" alt="drag-and-drop-incorrect" width="500"/>
+      <img src="frontend/public/screenshots/drag-and-drop-incorrect.png" alt="drag-and-drop-incorrect" width="450"/>
     </td>
   </tr>
 </table>
 
----
+<br>
 
 ### Victory Dialog
-- Triggered when the player fills the progress bar before the 2-minute time limit.
-- Displays a celebratory congratulations message.
-- Includes a confetti animation to reward the player for winning the hackathon challenge.
+Triggered when the player fills the progress bar before the two-minute time limit, displaying a celebratory congratulations message alongside a confetti animation to reward the player for winning the hackathon challenge.
+
 <p align="center">
-  <img src="frontend/public/screenshots/win.png" alt="win" height="500"/>
+  <img src="frontend/public/screenshots/win.png" alt="win" width="500"/>
 </p>
 
----
+<br>
 
 ### Game Over Dialog
-- Triggered when the 2-minute timer runs out before the progress bar is filled.
-- Displays a game-over screen to indicate the hackathon challenge was not completed in time.
+Triggered when the two-minute timer runs out before the progress bar is filled, displaying a game over screen to indicate the hackathon challenge was not completed in time.
+
 <p align="center">
-  <img src="frontend/public/screenshots/game-over.png" alt="game-over" height="500"/>
+  <img src="frontend/public/screenshots/game-over.png" alt="game-over" width="500"/>
 </p>
 
+<br>
+
+## Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | Next.js, React, TypeScript, Tailwind CSS |
+| Game Engine | Phaser.js |
+| Backend | FastAPI, Python |
+| Libraries | CrewAI (builds and runs the quiz and hint generating AI agents),<br>LangChain (connects the AI agents to OpenAI's models),<br>Zustand (manages state across the game's stores),<br>React Confetti (displays the win animation) |
+| APIs | OpenAI GPT-4o (generates personalized quiz questions and contextual hints) |
 
 <br>
 
-## How We Built It
-Overhacked was built using the following tech stack:
+## How It Works
 
-- **Phaser.js (Game engine):** A new tool for all members of our team, used to build the core game mechanics, scenes, player movement, and interactions.
-- **Next.js, React.js, and TypeScript (Frontend & UI):** Next.js served as the framework for structuring the application, while React.js and TypeScript were used to build UI components and ensure type safety. This stack was utilized by many of our members previously in prior personal and hackathon projects, making it the ideal frontend tool for rapid development.
-- **OpenAI + CrewAI (Agentic AI integration): We leveraged OpenAI’s large language models (LLMs) to generate dynamic content for our games, such as quiz questions and hints. CrewAI was used to create specialized AI agents for each mini-game. These agents serve two main purposes:
-  - **Quiz Creator Agents:** Generate personalized quizzes based on the player's experience level and preferred programming language to adapt the mini-games to the player's level of skill.
-  - **Hint Agents:** Provide contextual hints for each question, helping players understand concepts without giving away the answers directly.
-- **FastAPI + Python (Backend API endpoints):** Used to handle backend logic and API communication, including GET and POST requests for returning prompted questions.
+### Frontend and Game Scene
+The frontend is built with Next.js and React, with the core gameplay rendered through Phaser.js. The player and each NPC are rendered from individual sprite sheets, switching between walking and idle animations based on which arrow keys are held down. Tables and walls act as physical colliders, so the player is blocked from passing through them rather than simply overlapping visually. To detect when the player is close enough to talk to a teammate, the scene continuously measures the distance between the player and each NPC, and once that distance is small enough, it displays a prompt to press E and launches that NPC's minigame. Several Zustand stores hold state across the game, one for the user's form details, one for each minigame's questions and hints, and one for tracking which NPC the player is currently interacting with.
 
-<br>
+### Requesting a Minigame Question
+When a player fills out the form at the start of the game, their name, years of experience, and favourite language are saved to a Zustand store and carried with them for the rest of the session. Walking up to a teammate NPC and pressing E triggers a request from the frontend to the FastAPI backend, sent as a POST request with the player's stored name, experience, and language as the payload.
 
-## Challenges We Ran Into
-It was the first time using Phaser.js for everyone on the team. While some members focused primarily on UI or backend development, integrating the game frontend with the backend APIs was particularly challenging. On the frontend side, we learned how to design and structure Phaser scenes, manage sprite sheets and animations, implement player movement and collision handling, and coordinate interactive elements such as NPC proximity triggers and UI overlays within a real-time game loop. For the backend side, it was our first time using FastAPI, and there was a significant learning curve around defining clear schemas, naming them appropriately, and integrating them with agentic AI workflows. Overall, the project required close collaboration to align gameplay logic, UI state, and backend data flow into a cohesive experience.
+### Generating a Question with Agentic AI
+Each minigame has its own API route on the backend, and both routes use CrewAI to build two specialized agents that work together to generate content for each round:
 
-<br>
+- **Quiz Creator Agents** generate a personalized question, powered by OpenAI's GPT-4o model, tailored to the player's experience level and preferred programming language to adapt the difficulty of the minigame to their skill level.
+- **Hint Agents** generate a series of contextual hints for that same question, helping players understand the underlying concepts without giving away the answer directly.
 
-## Accomplishments That We're Proud Of
-We’re very proud that we were able to deliver a fully working MVP using several technologies that were completely new to our team. While the gameplay itself is intentionally straightforward, building it required a deep dive into core game mechanics such as scene management, player movement, collisions, state handling, and real-time UI updates. Beyond the game logic, we also learned how interactive UI components, AI-driven content, and backend APIs need to work together seamlessly to create an experience that feels responsive and immersive for the player. Integrating Phaser scenes with a modern React and Next.js frontend, while coordinating real-time interactions with AI-powered NPCs, pushed us to think carefully about architecture, performance, and user experience. Overall, this project was a valuable learning experience that challenged us to step outside our comfort zones, rapidly learn unfamiliar tools, and collaborate effectively under tight time constraints to turn an idea into a playable game.
+For the multiple choice route, the Quiz Creator Agent produces a trivia style question with four answer choices, testing object oriented programming concepts. For the drag and drop route, it instead produces a short, reorderable snippet of code testing the same kinds of concepts. Both agents' output is combined and returned as a single JSON response, which is parsed and validated against a Pydantic schema before being sent back to the frontend.
 
-<br>
-
-## What We Learned
-Through this project, we learned the fundamentals of 2D game design, including how to structure scenes, manage player movement and collisions, and design interactive gameplay loops. While this experience only scratched the surface of what Phaser.js has to offer, it gave us a strong foundation and a clear appreciation for the depth of the game engine. As a collaborative team effort, we also significantly improved our development workflows and teamwork. Working with Git and GitHub in a fast-paced environment helped us become more comfortable with branching strategies, pull requests, and resolving merge conflicts.
+### Displaying Results and Tracking Progress
+The frontend stores this response in the relevant Zustand store and displays it in the corresponding minigame dialog. Submitting an answer checks it against the correct answer included in the response, updates the player's progress in the active store, and provides immediate visual feedback by highlighting the result in green or red. The game scene reads the player's overall progress from these stores to fill the progress bar, triggering the victory dialog and a React Confetti animation once the bar is completely filled, or the game over dialog if the two-minute timer runs out first.
 
 <br>
 
-## What's Next For Overhacked!
-Improved AI agents by adding a game "master" whom oversees the entire game, directing NPC agents to curate the difficulty of the questions depending on how quickly the player answers them/how many they answer correctly.
-Figure out how to improve AI response latency, as there is still some prolonged loading time between NPC interaction with question generation.
-Store each user's quiz results to better personalize content and optimize question difficulty, enabling players to learn more efficiently.
-Add more real-life hackathon scenarios into the game that can affect the outcome (e.g. NPC dialogue, NPCs start to get tired/demotivated, NPCs getting distracted, Fixing bugs in real-time, Sudden typing tests, Disappearing members that the player needs to find, etc.).
-As mentioned above: More subjects and topics to study from (e.g. Full stack development including front-end and backend, data structures and algorithms, systems design, etc.).
-Data persistence with a database to store logged user data, alongside a leaderboard that shows the highest scores.
-More animated elements to the UI to add greater engagement for the player!
+## Technical Challenges
+
+- It was the first time using Phaser.js for everyone on the team. Integrating the game frontend with the backend APIs was particularly challenging, since some members focused primarily on UI while others focused on backend development
+- It was also the team's first time using FastAPI, with a significant learning curve around defining clear schemas, naming them appropriately, and integrating them with agentic AI workflows
 
 <br>
 
-## How to Run Locally (Frontend & Backend)
+## Achievements
 
-### 1. Prerequisites
-Make sure you have the following installed:
-- **Node.js (v18 or later)**: Used for running the Next.js frontend and managing JavaScript dependencies. Check the Node.js version using:
-  ```bash
-  node --version
-  ```
-- **Python (3.10 or later)**: Required for running the FastAPI backend and AI agents. Check the Python version using:
-  ```bash
-  python --version
-  ```
-- **Git**: Used to clone the repository. Check the Git version using:
-  ```bash
-  git --version
-  ```
+- Learned how to design and structure Phaser scenes, manage sprite sheets and animations, implement player movement and collision handling, and coordinate interactive elements such as NPC proximity triggers and UI overlays within a real-time game loop
+- Successfully delivered a fully working MVP using several technologies that were completely new to the team, requiring a deep dive into core game mechanics such as scene management, player movement, collisions, state handling, and real-time UI updates
+- Integrated Phaser scenes with a modern React and Next.js frontend while coordinating real-time interactions with AI-powered NPCs, requiring careful thought about architecture, performance, and user experience
+- Improved development workflows and teamwork under a tight timeline, including becoming more comfortable with Git branching strategies, pull requests, and resolving merge conflicts
 
-### 2. Clone the repository
-Clone the repository and navigate into the project root directory by running:
+<br>
+
+## Future Improvements
+Several enhancements are planned to extend the functionality of the application:
+- An AI game "master" that oversees the entire game, directing NPC agents to adjust question difficulty based on how quickly and accurately the player answers
+- Improved AI response latency, since there is still some noticeable loading time between an NPC interaction and question generation
+- Storing each user's quiz results to better personalize content and optimize question difficulty over time
+- More real-life hackathon scenarios that affect gameplay, such as NPC dialogue, NPCs getting tired or distracted, fixing bugs in real-time, sudden typing tests, or disappearing teammates the player needs to find
+- Additional subjects to study beyond object oriented programming, such as full-stack development, data structures and algorithms, and systems design
+- Data persistence with a database to store user data and power a leaderboard of the highest scores
+- More animated UI elements to increase player engagement
+
+<br>
+
+## Getting Started
+
+Follow the steps below to set up and run the application on your own machine. This project requires both a frontend and a backend server running at the same time.
+
+**Prerequisites**
+
+Make sure Node.js, Python, and Git are installed before you begin. You can check each by running the commands below, which should print a version number.
 ```bash
-git clone https://github.com/steph-xue/overhacked.git
-cd overrhacked
+node --version
+python --version
+git --version
 ```
 
-### 3. Install frontend dependencies
-From the project root, navigate to the frontend directory and install the dependencies using:
+**1. Clone the repository**
+
+This downloads a copy of the project to your computer and moves you into the project folder.
+```bash
+git clone https://github.com/steph-xue/overhacked.git
+cd overhacked
+```
+
+**2. Install the frontend dependencies**
+
+This installs React, Next.js, and everything else the frontend needs to run.
 ```bash
 cd frontend
 npm install
 ```
 
-### 4. Start the frontend development server
-Use the command:
+**3. Start the frontend development server**
+
+This runs the frontend locally.
 ```bash
 npm run dev
 ```
-Once started, the frontend will be available at:
-```bash
-http://localhost:3000
-```
 
-### 5. Navigate to the backend directory
-From the project root, navigate to the backend directory by running:
+Once the server is running, the frontend will be available at `http://localhost:3000`.
+
+**4. Set up the backend environment**
+
+In a new terminal, navigate to the backend folder and create a Python virtual environment.
 ```bash
 cd backend
-```
-
-### 6. Virtual environment
-Create and activate a Python virtual environment using:
-```bash
 python -m venv venv
-source venv/bin/activate  # Linux / macOS
-venv\Scripts\activate     # Windows
+source venv/bin/activate      # On Windows use: venv\Scripts\activate
 ```
 
-### 7. Install backend dependencies
-Install all required Python packages by running:
+**5. Install the backend dependencies**
+
+This installs FastAPI, CrewAI, and everything else the backend needs to run.
 ```bash
 pip install -r requirements.txt
 ```
 
-### 8. Set backend environment variables
-Create a .env file in the backend directory and add in the following:
+**6. Set up environment variables**
+
+Create a `.env` file inside the `backend` folder with your OpenAI API key.
 ```bash
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-### 5. Run the backend server
-Launch the FastAPI backend server using Uvicorn using:
+**7. Start the backend server**
+
+This runs the FastAPI backend using Uvicorn.
 ```bash
-uvicorn main:app --reload  --port 8000
+uvicorn main:app --reload --port 8000
 ```
-The server will start at: http://127.0.0.1:8000
+
+Once both servers are running, the backend will be available at `http://127.0.0.1:8000`.
