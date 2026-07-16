@@ -2,7 +2,7 @@
 <h2 align="center">(nwHacks 2026)</h2>
 
 <h4 align="center">
-  A cozy hackathon game where you talk to teammates,<br>
+  A cozy 2D pixel art hackathon game where you talk to teammates,<br>
   solve coding challenges, and race the clock to win together!
 </h4>
 
