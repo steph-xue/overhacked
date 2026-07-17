@@ -46,7 +46,7 @@ As CS students, attending hackathons is one of our favourite ways to meet new pe
 
 ## Overview
 
-This project is a full-stack, web-based 2D pixel art hackathon game where players answer programming questions from their teammates to fill a progress bar before a two-minute timer runs out. Questions come in two main formats, multiple choice and drag and drop, both powered and personalized by agentic AI workflows based on information the player enters into a form at the start of the game. Multiple-choice questions are trivia style and test object oriented programming concepts without requiring the player to write any code, and answering correctly increases the progress bar by 25%. Drag-and-drop questions are hands-on code structuring exercises that also test object oriented programming concepts, and completing one correctly increases the bar by 50%. Players win by filling the progress bar before time runs out. The game is built with Next.js, React, TypeScript, HTML, and Tailwind CSS on the frontend, with Phaser.js serving as the game engine that powers scenes, player movement, and interactions. The backend uses FastAPI and Python, with OpenAI and CrewAI powering the agentic AI workflow that generates the personalized minigame questions and hints. The Zustand library manages state across the game's stores, and React Confetti renders a falling confetti animation when a player completes the game.
+This project is a full-stack, web-based 2D pixel art hackathon game where players answer programming questions from their teammates to fill a progress bar before a two-minute timer runs out. Questions come in two main formats, multiple choice and drag and drop, both powered and personalized by agentic AI workflows based on information the player enters into a form at the start of the game. Multiple-choice questions are trivia style and test object oriented programming concepts without requiring the player to write any code, and answering correctly increases the progress bar by 25%. Drag-and-drop questions are hands-on code structuring exercises that also test object oriented programming concepts, and completing one correctly increases the bar by 50%. Players win by filling the progress bar before time runs out. The game is built with Next.js, React, TypeScript, and Tailwind CSS on the frontend, with Phaser.js serving as the game engine that powers scenes, player movement, and interactions. The backend uses FastAPI and Python, with OpenAI and CrewAI powering the agentic AI workflow that generates the personalized minigame questions and hints. The Zustand library manages state across the game's stores, and React Confetti renders a falling confetti animation when a player completes the game.
 
 <br>
 
@@ -181,7 +181,7 @@ Triggered when the two-minute timer runs out before the progress bar is filled, 
 
 | Layer | Technologies |
 |---|---|
-| Frontend | Next.js, React, TypeScript, HTML, Tailwind CSS |
+| Frontend | Next.js, React, TypeScript, Tailwind CSS |
 | Game Engine | Phaser.js |
 | Backend | FastAPI, Python |
 | Libraries | CrewAI (builds and runs the quiz and hint generating AI agents),<br>LangChain (connects the AI agents to OpenAI's models),<br>Zustand (manages state across the game's stores),<br>React Confetti (displays the win animation) |
