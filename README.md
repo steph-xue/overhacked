@@ -2,7 +2,7 @@
 <h2 align="center">(nwHacks 2026)</h2>
 
 <h4 align="center">
-  A cozy 2D pixel art hackathon game powered by agentic AI. <br>
+  A 2D pixel art hackathon game powered by agentic AI. <br>
   Solve coding challenges and race the clock to win together!
 </h4>
 
