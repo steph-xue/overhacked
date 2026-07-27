@@ -31,6 +31,7 @@ async def ask_agent(request: CodingQuizRequest) -> CodingQuizResponse:
         First, determine whether {language} is a real, recognized object-oriented programming language.
         - If {language} is clearly a real object-oriented language, write the coding quiz in {language}, using its specific syntax.
         - If {language} is clearly not object-oriented, or is not a real, recognized programming language at all, write the coding quiz in Java instead, since {language} does not have real class/OOP syntax to build a meaningful exercise out of.
+        - If you are unsure whether {language} is object-oriented, or it only partially supports OOP, default to Java instead, using Java's specific syntax.
 
         Do not invent or assume syntax that doesn't actually exist in the language you end up writing the code in.
 
