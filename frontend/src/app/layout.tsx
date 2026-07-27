@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Silkscreen } from "next/font/google";
+import BackendWarmup from "@/components/BackendWarmup";
 
 const silkscreen = Silkscreen({
   weight: ["400", "700"],
@@ -20,6 +21,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicons/overhacked-favicon.png" />
       </head>
       <body className={`${silkscreen.className} min-h-screen bg-[#F3E9D9]`}>
+        <BackendWarmup />
         {children}
       </body>
     </html>
