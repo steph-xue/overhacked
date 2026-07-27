@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import useUserStore from "./useUserStore";
 
-type MCQItem = {
+export type MCQItem = {
   question: string;
   choices: string[];
   answer: number;

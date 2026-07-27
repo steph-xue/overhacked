@@ -1,6 +1,5 @@
 // src/game/ui/HintContent.ts
 import * as Phaser from "phaser";
-import { useNpcStore } from "@/stores/useNpcStore";
 
 export default class HintContent {
   private scene: Phaser.Scene;
@@ -36,32 +35,6 @@ export default class HintContent {
 
   mount() {
     const s = this.scene;
-
-    const { data, loading, error } = useNpcStore.getState();
-
-    if (loading || !data) {
-      const txt = s.add.text(0, 0, "Loading question...", {
-        fontFamily: "Silkscreen",
-        fontSize: "32px",
-        color: "#4A3F35",
-      });
-
-      this.root.add(txt);
-      this.objects.push(txt);
-      return;
-    }
-
-    if (error) {
-      const txt = s.add.text(0, 0, "Failed to load question", {
-        fontFamily: "Silkscreen",
-        fontSize: "32px",
-        color: "#B00020",
-      });
-
-      this.root.add(txt);
-      this.objects.push(txt);
-      return;
-    }
 
     const TOP_OFFSET = 20;
 

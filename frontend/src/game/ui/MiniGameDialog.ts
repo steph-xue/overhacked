@@ -1,12 +1,15 @@
 // src/game/ui/Dialog.ts
 import * as Phaser from "phaser";
-import MultipleChoiceContents from "./MultipleChoiceContents";
 import MultipleChoiceContents2 from "./MultipleChoiceContents2";
 import DragAndDropContents from "./DragAndDropContents";
 import HintContent from "./HintContent";
-import { useNpcStore } from "@/stores/useNpcStore";
-import { useMCStore } from "@/stores/useMCStore";
 import { useCodingQuizStore } from "@/stores/useCodingQuizStore";
+import type { MCQItem } from "@/stores/useMCStore";
+
+type DialogPayload = {
+  quiz?: MCQItem;
+  hints?: string[];
+};
 
 export type DialogContentType = "multipleChoice" | "dragAndDrop";
 
@@ -50,23 +53,20 @@ export default class MiniGameDialog {
 
   private registry: Record<
     DialogContentType,
-    (payload?: any) => { mount: () => void; unmount: () => void }
+    (payload?: DialogPayload) => { mount: () => void; unmount: () => void }
   > = {
-    // multipleChoice: () =>
-    //   new MultipleChoiceContents(
-    //     this.scene,
-    //     this.mainRoot,
-    //     this.getMainContentWidth(),
-    //     (correct) => this.scene.events.emit("mcq-answered", correct),
-    //   ),
-    multipleChoice: (payload) =>
-      new MultipleChoiceContents2(
+    multipleChoice: (payload) => {
+      if (!payload?.quiz) {
+        throw new Error("multipleChoice dialog requires a quiz payload");
+      }
+      return new MultipleChoiceContents2(
         this.scene,
         this.mainRoot,
         this.getMainContentWidth(),
         (correct) => this.scene.events.emit("mcq-answered", correct),
         payload.quiz
-      ),
+      );
+    },
     dragAndDrop: () =>
       new DragAndDropContents(
         this.scene,
@@ -113,7 +113,7 @@ export default class MiniGameDialog {
     return this.open;
   }
 
-  show(type: DialogContentType, payload?: any) {
+  show(type: DialogContentType, payload?: DialogPayload) {
     this.currentType = type;
 
     this.unmountAll();
@@ -202,7 +202,6 @@ export default class MiniGameDialog {
     const innerH = this.panelH - this.PAD * 2;
 
     const leftW = Math.floor(innerW * this.MAIN_RATIO);
-    const rightW = innerW - leftW - this.GAP;
 
     const innerLeftX = -this.panelW / 2 + this.PAD;
     const innerTopY = -this.panelH / 2 + this.PAD;

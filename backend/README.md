@@ -1,7 +1,7 @@
 # Overhacked backend
 ## Requirements
 
-- Python 3.10+
+- Python 3.10–3.13 (crewai does not yet support 3.14+; if `python3 --version` reports 3.14 or higher, use an older interpreter, e.g. `python3.12`, when creating the virtual environment below)
 - See `requirements.txt` for full dependencies.
 
 ## Setup
@@ -31,7 +31,7 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 ### 5. Run the server
 ```bash
-uvicorn main:app --reload  --port 8000
+uvicorn main:app --reload --port 8000
 ```
 The server will start at: http://127.0.0.1:8000
 

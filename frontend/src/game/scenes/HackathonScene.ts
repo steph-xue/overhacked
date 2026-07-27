@@ -1,8 +1,6 @@
 import * as Phaser from "phaser";
 import MiniGameDialog from "@/game/ui/MiniGameDialog";
-import { useNpcStore } from "@/stores/useNpcStore";
 import { useCodingQuizStore } from "@/stores/useCodingQuizStore";
-import { useDragDropStore } from "@/stores/useDragDropStore";
 import { useMCStore } from "@/stores/useMCStore";
 import ScoreBoard from "@/game/ui/ScoreBoard";
 import GameOverDialog from "@/game/ui/GameOverDialog";
@@ -123,45 +121,45 @@ export default class HackathonScene extends Phaser.Scene {
   preload() {
     this.load.image(
       "hackathon-background",
-      "/assets/backgrounds/hackathon-background.png"
+      "/images/backgrounds/hackathon-background.png"
     );
 
-    this.load.spritesheet("player", "/assets/sprites/player.png", {
+    this.load.spritesheet("player", "/images/sprites/player.png", {
       frameWidth: 24,
       frameHeight: 24,
     });
 
-    this.load.spritesheet("npc1", "/assets/sprites/npc1.png", {
+    this.load.spritesheet("npc1", "/images/sprites/npc1.png", {
       frameWidth: 24,
       frameHeight: 24,
     });
-    this.load.spritesheet("npc2", "/assets/sprites/npc2.png", {
+    this.load.spritesheet("npc2", "/images/sprites/npc2.png", {
       frameWidth: 24,
       frameHeight: 24,
     });
-    this.load.spritesheet("npc3", "/assets/sprites/npc3.png", {
+    this.load.spritesheet("npc3", "/images/sprites/npc3.png", {
       frameWidth: 24,
       frameHeight: 24,
     });
-    this.load.spritesheet("npc4", "/assets/sprites/npc4.png", {
+    this.load.spritesheet("npc4", "/images/sprites/npc4.png", {
       frameWidth: 24,
       frameHeight: 24,
     });
-    this.load.spritesheet("npc5", "/assets/sprites/npc5.png", {
+    this.load.spritesheet("npc5", "/images/sprites/npc5.png", {
       frameWidth: 24,
       frameHeight: 24,
     });
 
-    this.load.spritesheet("mentor", "/assets/sprites/mentor.png", {
+    this.load.spritesheet("mentor", "/images/sprites/mentor.png", {
       frameWidth: 24,
       frameHeight: 24,
     });
 
     // Load the audio
-    this.load.audio("bgm", "/assets/audio/hackathon-audio.wav");
+    this.load.audio("bgm", "/audio/hackathon-audio.wav");
 
     // FOR TESTING
-    this.load.spritesheet("npc-exclaim", "/assets/sprites/exclaim_alert.png", {
+    this.load.spritesheet("npc-exclaim", "/images/sprites/exclaim_alert.png", {
       frameWidth: 16,
       frameHeight: 16,
     });
@@ -623,29 +621,10 @@ export default class HackathonScene extends Phaser.Scene {
     // only act on key press
     if (!Phaser.Input.Keyboard.JustDown(this.keyE)) return;
 
-    const { data, loading, error } = useNpcStore.getState();
-
-    if (error) {
-      console.log("NPC error:", error);
-      return;
-    }
-
-    // If already fetching, just show loading UI
-    if (loading) {
-      this.showLoading();
-      return;
-    }
-
-    // If we don't have data yet, fetch it (and show loading immediately)
-    if (!data) {
-      void this.openNpcMinigame(); // open loading -> await fetch -> swap to multipleChoice
-      return;
-    }
-
     if (this.nearNpc.game === "multipleChoice") {
       this.openMultipleChoiceDialog();
     } else {
-      this.dialog.show("dragAndDrop");
+      void this.openDragAndDropDialog();
     }
   }
 
@@ -802,29 +781,6 @@ export default class HackathonScene extends Phaser.Scene {
     });
   }
 
-  private async openNpcMinigame() {
-    this.showLoading();
-
-    const myToken = ++this.npcFetchToken; // token for THIS request
-    const npcStore = useNpcStore.getState();
-
-    try {
-      await npcStore.fetchNpcData();
-
-      // if user canceled / walked away, ignore
-      if (myToken !== this.npcFetchToken) return;
-
-      this.hideLoading();
-      this.dialog.show("multipleChoice");
-    } catch (e) {
-      if (myToken !== this.npcFetchToken) return;
-
-      console.error(e);
-      this.hideLoading();
-      this.dialog.hide();
-    }
-  }
-
   private showLoading() {
     if (this.loadingDialog) return;
 
@@ -842,6 +798,54 @@ export default class HackathonScene extends Phaser.Scene {
   private hideLoading() {
     this.loadingDialog?.destroy();
     this.loadingDialog = undefined;
+  }
+
+  private waitForCodingQuizFetch(): Promise<void> {
+    return new Promise((resolve) => {
+      const unsubscribe = useCodingQuizStore.subscribe((state) => {
+        if (!state.loading) {
+          unsubscribe();
+          resolve();
+        }
+      });
+    });
+  }
+
+  private async openDragAndDropDialog() {
+    const store = useCodingQuizStore.getState();
+
+    if (store.data) {
+      this.dialog.show("dragAndDrop");
+      return;
+    }
+
+    this.showLoading();
+    const myToken = ++this.npcFetchToken;
+
+    try {
+      if (store.loading) {
+        await this.waitForCodingQuizFetch();
+      } else {
+        await useCodingQuizStore.getState().fetchCodingQuiz();
+      }
+
+      // if user canceled / walked away, ignore
+      if (myToken !== this.npcFetchToken) return;
+
+      // transient failure (rate limit, network blip) - silently retry once
+      if (!useCodingQuizStore.getState().data) {
+        await useCodingQuizStore.getState().fetchCodingQuiz();
+        if (myToken !== this.npcFetchToken) return;
+      }
+
+      this.hideLoading();
+      this.dialog.show("dragAndDrop");
+    } catch (e) {
+      if (myToken !== this.npcFetchToken) return;
+
+      console.error(e);
+      this.hideLoading();
+    }
   }
 
   // =========================

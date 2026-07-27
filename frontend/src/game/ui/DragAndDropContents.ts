@@ -33,22 +33,11 @@ export default class DragAndDropContents {
     const s = this.scene;
 
     const { data, loading, error } = useCodingQuizStore.getState();
-    if (loading || !data) {
+    if (loading || error || !data) {
       const txt = s.add.text(0, 0, "Loading question...", {
         fontFamily: "Silkscreen",
         fontSize: "32px",
         color: "#4A3F35",
-      });
-
-      this.root.add(txt);
-      this.objects.push(txt);
-      return;
-    }
-    if (error) {
-      const txt = s.add.text(0, 0, "Failed to load question", {
-        fontFamily: "Silkscreen",
-        fontSize: "32px",
-        color: "#B00020",
       });
 
       this.root.add(txt);

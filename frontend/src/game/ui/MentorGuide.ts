@@ -17,7 +17,7 @@ export default class MentorGuide {
     // If already shown, remove first
     this.hide();
 
-    const { width, height } = s.scale;
+    const { width } = s.scale;
 
     const W = Math.min(520, Math.floor(width * 0.42));
     const H = 200;

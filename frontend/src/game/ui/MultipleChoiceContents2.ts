@@ -69,10 +69,10 @@ export default class MultipleChoiceContents2 {
     //   return;
     // }
 
-    // const questionData: QuestionData = error || !data ? fallback : data;
+    const questionData =
+      this.quiz?.question && this.quiz.choices?.length ? this.quiz : fallback;
 
-    // const { question, choices, answer } = questionData;
-    const { question, choices, answer } = this.quiz;
+    const { question, choices, answer } = questionData;
     this.correctIndex = Phaser.Math.Clamp(answer, 0, choices.length - 1);
 
     // -------------------------

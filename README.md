@@ -56,7 +56,7 @@ This project is a full-stack, web-based 2D pixel art hackathon game where player
 Serves as the entry point to the game, designed with a clean, simple UI to quickly guide users into gameplay.
 
 <p align="center">
-  <img src="frontend/public/screenshots/landing-page.png" alt="landing" width="500"/>
+  <img src="docs/screenshots/landing-page.png" alt="landing" width="500"/>
 </p>
 
 <br>
@@ -68,7 +68,7 @@ Before entering the game, players fill out a form with the following information
 - **Favourite programming language**, used to tailor minigame question generation
 
 <p align="center">
-  <img src="frontend/public/screenshots/user-form.png" alt="user-form" width="500"/>
+  <img src="docs/screenshots/user-form.png" alt="user-form" width="500"/>
 </p>
 
 <br>
@@ -90,10 +90,10 @@ The game takes place on a top-down 2D hackathon room, brought to life through a 
 <table align="center">
   <tr>
     <td>
-      <img src="frontend/public/screenshots/game-scene.png" alt="game" width="450"/>
+      <img src="docs/screenshots/game-scene.png" alt="game" width="450"/>
     </td>
     <td>
-      <img src="frontend/public/screenshots/talk-with-team.png" alt="talk-with-team" width="450"/>
+      <img src="docs/screenshots/talk-with-team.png" alt="talk-with-team" width="450"/>
     </td>
   </tr>
 </table>
@@ -104,7 +104,7 @@ The game takes place on a top-down 2D hackathon room, brought to life through a 
 Mentor alerts appear randomly throughout gameplay at the bottom right, providing guidance, encouragement, or hints when players may be stuck. This adds a layer of realism and support, simulating mentor check-ins during a real hackathon.
 
 <p align="center">
-  <img src="frontend/public/screenshots/mentor-popup.png" alt="mentor-popup" width="500"/>
+  <img src="docs/screenshots/mentor-popup.png" alt="mentor-popup" width="500"/>
 </p>
 
 <br>
@@ -119,20 +119,20 @@ Both minigames follow a consistent structure. A loading screen appears while the
 <table align="center">
   <tr>
     <td>
-      <img src="frontend/public/screenshots/multiple-choice1.png" alt="multiple-choice1" width="450"/>
+      <img src="docs/screenshots/multiple-choice1.png" alt="multiple-choice1" width="450"/>
     </td>
     <td>
-      <img src="frontend/public/screenshots/multiple-choice1-correct.png" alt="multiple-choice1-correct" width="450"/>
+      <img src="docs/screenshots/multiple-choice1-correct.png" alt="multiple-choice1-correct" width="450"/>
     </td>
   </tr>
 </table>
 <table align="center">
   <tr>
     <td>
-      <img src="frontend/public/screenshots/multiple-choice2.png" alt="multiple-choice2" width="450"/>
+      <img src="docs/screenshots/multiple-choice2.png" alt="multiple-choice2" width="450"/>
     </td>
     <td>
-      <img src="frontend/public/screenshots/multiple-choice2-incorrect.png" alt="multiple-choice2-incorrect" width="450"/>
+      <img src="docs/screenshots/multiple-choice2-incorrect.png" alt="multiple-choice2-incorrect" width="450"/>
     </td>
   </tr>
 </table>
@@ -144,15 +144,15 @@ Both minigames follow a consistent structure. A loading screen appears while the
 - Completing one correctly increases progress by 50%
 
 <p align="center">
-  <img src="frontend/public/screenshots/drag-and-drop.png" alt="drag-and-drop" height="300"/>
+  <img src="docs/screenshots/drag-and-drop.png" alt="drag-and-drop" height="300"/>
 </p>
 <table align="center">
   <tr>
     <td>
-      <img src="frontend/public/screenshots/drag-and-drop-correct.png" alt="drag-and-drop-correct" width="450"/>
+      <img src="docs/screenshots/drag-and-drop-correct.png" alt="drag-and-drop-correct" width="450"/>
     </td>
     <td>
-      <img src="frontend/public/screenshots/drag-and-drop-incorrect.png" alt="drag-and-drop-incorrect" width="450"/>
+      <img src="docs/screenshots/drag-and-drop-incorrect.png" alt="drag-and-drop-incorrect" width="450"/>
     </td>
   </tr>
 </table>
@@ -163,7 +163,7 @@ Both minigames follow a consistent structure. A loading screen appears while the
 Triggered when the player fills the progress bar before the two-minute time limit, displaying a celebratory congratulations message alongside a confetti animation to reward the player for winning the hackathon challenge.
 
 <p align="center">
-  <img src="frontend/public/screenshots/win.png" alt="win" width="500"/>
+  <img src="docs/screenshots/win.png" alt="win" width="500"/>
 </p>
 
 <br>
@@ -172,7 +172,7 @@ Triggered when the player fills the progress bar before the two-minute time limi
 Triggered when the two-minute timer runs out before the progress bar is filled, displaying a game over screen to indicate the hackathon challenge was not completed in time.
 
 <p align="center">
-  <img src="frontend/public/screenshots/game-over.png" alt="game-over" width="500"/>
+  <img src="docs/screenshots/game-over.png" alt="game-over" width="500"/>
 </p>
 
 <br>
@@ -242,14 +242,20 @@ Several enhancements are planned to extend the functionality of the application:
 
 Follow the steps below to set up and run the application on your own machine. This project requires both a frontend and a backend server running at the same time.
 
+<br>
+
 **Prerequisites**
 
-Make sure Node.js, Python, and Git are installed before you begin. You can check each by running the commands below, which should print a version number.
+Make sure Node.js, Python 3, and Git are installed before you begin. You can check each by running the commands below, which should print a version number.
+
+> **Note:** On Windows, replace `python3` with `python` in the commands below.
 ```bash
 node --version
-python --version
+python3 --version
 git --version
 ```
+
+<br>
 
 **1. Clone the repository**
 
@@ -259,51 +265,51 @@ git clone https://github.com/steph-xue/overhacked.git
 cd overhacked
 ```
 
-**2. Install the frontend dependencies**
-
-This installs React, Next.js, and everything else the frontend needs to run.
-```bash
-cd frontend
-npm install
-```
-
-**3. Start the frontend development server**
-
-This runs the frontend locally.
-```bash
-npm run dev
-```
-
-Once the server is running, the frontend will be available at `http://localhost:3000`.
-
-**4. Set up the backend environment**
-
-In a new terminal, navigate to the backend folder and create a Python virtual environment.
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate      # On Windows use: venv\Scripts\activate
-```
-
-**5. Install the backend dependencies**
-
-This installs FastAPI, CrewAI, and everything else the backend needs to run.
-```bash
-pip install -r requirements.txt
-```
-
-**6. Set up environment variables**
+**2. Set up environment variables**
 
 Create a `.env` file inside the `backend` folder with your OpenAI API key.
 ```bash
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-**7. Start the backend server**
+**3. Set up the backend environment**
+
+From the project root, move into the backend folder and create a Python virtual environment.
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate      # On Windows use: venv\Scripts\activate
+```
+
+**4. Install the backend dependencies**
+
+Install all dependencies like FastAPI, CrewAI, and everything else the backend needs to run.
+```bash
+pip install -r requirements.txt
+```
+
+**5. Start the backend server**
 
 This runs the FastAPI backend using Uvicorn.
 ```bash
 uvicorn main:app --reload --port 8000
 ```
 
-Once both servers are running, the backend will be available at `http://127.0.0.1:8000`.
+Once the server is running, the backend will be available at `http://127.0.0.1:8000`.
+
+**6. Install the frontend dependencies**
+
+In a new terminal, navigate to the frontend folder and install React, Next.js, and everything else the frontend needs to run.
+```bash
+cd frontend
+npm install
+```
+
+**7. Start the frontend development server**
+
+This runs the frontend locally.
+```bash
+npm run dev
+```
+
+Once both servers are running, the frontend will be available at `http://localhost:3000`.
