@@ -1,12 +1,16 @@
+import os
+
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import mcq_router, mcq2_router, coding_quiz_router, drag_drop_router
 # Create FastAPI instance
 app = FastAPI()
 # Configure CORS
+# ALLOWED_ORIGINS is a comma-separated list, e.g. "https://overhacked.onrender.com,https://example.com"
 origins = [
-    "http://localhost:3000",  # frontend URL
-    # Add other origins if needed, e.g., "https://yourdomain.com"
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    if origin.strip()
 ]
 
 app.add_middleware(

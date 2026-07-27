@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import useUserStore from "./useUserStore";
+import { API_BASE_URL } from "@/lib/api";
 
 type CodingQuizResponse = {
   question: string;
@@ -28,7 +29,7 @@ export const useCodingQuizStore = create<CodingQuizStore>((set) => ({
     set({ loading: true, error: null });
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/coding_quiz", {
+      const response = await fetch(`${API_BASE_URL}/coding_quiz`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

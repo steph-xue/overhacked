@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import useUserStore from "./useUserStore";
+import { API_BASE_URL } from "@/lib/api";
 
 export type MCQItem = {
   question: string;
@@ -88,7 +89,7 @@ export const useMCStore = create<MCStore>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/mcq2", {
+      const response = await fetch(`${API_BASE_URL}/mcq2`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
