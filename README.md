@@ -3,7 +3,7 @@
 
 <h4 align="center">
   A 2D pixel art hackathon game powered by agentic AI. <br>
-  Solve coding challenges and race the clock to win together!
+  Solve coding challenges and race against the clock to win together!
 </h4>
 
 <p align="center">
@@ -11,7 +11,8 @@
 </p>
 
 <p align="center">
-  <a href="https://devpost.com/software/overhacked">Devpost</a>
+  <a href="https://devpost.com/software/overhacked">Devpost</a> &nbsp;|&nbsp;
+  <a href="https://overhacked.onrender.com/">Live Demo</a>
 </p>
 
 <br>
@@ -46,7 +47,7 @@ As CS students, attending hackathons is one of our favourite ways to meet new pe
 
 ## Overview
 
-This project is a full-stack, web-based 2D pixel art hackathon game where players answer programming questions from their teammates to fill a progress bar before a two-minute timer runs out. Questions come in two main formats, multiple choice and drag and drop, both powered and personalized by agentic AI workflows based on information the player enters into a form at the start of the game. Multiple-choice questions are trivia style and test object oriented programming concepts without requiring the player to write any code, and answering correctly increases the progress bar by 25%. Drag-and-drop questions are hands-on code structuring exercises that also test object oriented programming concepts, and completing one correctly increases the bar by 50%. Players win by filling the progress bar before time runs out. The game is built with Next.js, React, TypeScript, and Tailwind CSS on the frontend, with Phaser.js serving as the game engine that powers scenes, player movement, and interactions. The backend uses FastAPI and Python, with OpenAI and CrewAI powering the agentic AI workflow that generates the personalized minigame questions and hints. The Zustand library manages state across the game's stores, and React Confetti renders a falling confetti animation when a player completes the game.
+This project is a full-stack, web-based 2D pixel art hackathon game where players answer programming questions from their teammates to fill a progress bar before a two-minute timer runs out. Questions come in two main formats, multiple choice and drag and drop, both powered and personalized by agentic AI workflows based on information the player enters into a form at the start of the game. Multiple-choice questions are trivia style and test object oriented programming concepts without requiring the player to write any code, and answering correctly increases the progress bar by 25%. Drag-and-drop questions are hands-on code structuring exercises that also test object oriented programming concepts, and completing one correctly increases the bar by 50%. Players win by filling the progress bar before time runs out. The game is built with Next.js, React, TypeScript, and Tailwind CSS on the frontend, with Phaser serving as the game engine that powers scenes, player movement, and interactions. The backend uses FastAPI and Python, with OpenAI and CrewAI powering the agentic AI workflow that generates the personalized minigame questions and hints. The Zustand library manages state across the game's stores, and React Confetti renders a falling confetti animation when a player completes the game. The application is deployed on Render for cloud hosting.
 
 <br>
 
@@ -182,17 +183,18 @@ Triggered when the two-minute timer runs out before the progress bar is filled, 
 | Layer | Technologies |
 |---|---|
 | Frontend | Next.js, React, TypeScript, Tailwind CSS |
-| Game Engine | Phaser.js |
+| Game Engine | Phaser |
 | Backend | FastAPI, Python |
 | Libraries | CrewAI (builds and runs the quiz and hint generating AI agents),<br>LangChain (connects the AI agents to OpenAI's models),<br>Zustand (manages state across the game's stores),<br>React Confetti (displays the win animation) |
 | APIs | OpenAI GPT-4o (generates personalized quiz questions and contextual hints) |
+| Deployment | Render |
 
 <br>
 
 ## How It Works
 
 ### Frontend and Game Scene
-The frontend is built with Next.js and React, with the core gameplay rendered through Phaser.js. The player and each NPC are rendered from individual sprite sheets, switching between walking and idle animations based on which arrow keys are held down. Tables and walls act as physical colliders, so the player is blocked from passing through them rather than simply overlapping visually. To detect when the player is close enough to talk to a teammate, the scene continuously measures the distance between the player and each NPC, and once that distance is small enough, it displays a prompt to press E and launches that NPC's minigame. Several Zustand stores hold state across the game, one for the user's form details, one for each minigame's questions and hints, and one for tracking which NPC the player is currently interacting with.
+The frontend is built with Next.js and React, with the core gameplay rendered through Phaser. The player and each NPC are rendered from individual sprite sheets, switching between walking and idle animations based on which arrow keys are held down. Tables and walls act as physical colliders, so the player is blocked from passing through them rather than simply overlapping visually. To detect when the player is close enough to talk to a teammate, the scene continuously measures the distance between the player and each NPC, and once that distance is small enough, it displays a prompt to press E and launches that NPC's minigame. Several Zustand stores hold state across the game, one for the user's form details, one for each minigame's questions and hints, and one for tracking which NPC the player is currently interacting with.
 
 ### Requesting a Minigame Question
 When a player fills out the form at the start of the game, their name, years of experience, and favourite language are saved to a Zustand store and carried with them for the rest of the session. Walking up to a teammate NPC and pressing E triggers a request from the frontend to the FastAPI backend, sent as a POST request with the player's stored name, experience, and language as the payload.
@@ -212,7 +214,7 @@ The frontend stores this response in the relevant Zustand store and displays it 
 
 ## Technical Challenges
 
-- It was the first time using Phaser.js for everyone on the team. Integrating the game frontend with the backend APIs was particularly challenging, since some members focused primarily on UI while others focused on backend development
+- It was the first time using Phaser for everyone on the team. Integrating the game frontend with the backend APIs was particularly challenging, since some members focused primarily on UI while others focused on backend development
 - It was also the team's first time using FastAPI, with a significant learning curve around defining clear schemas, naming them appropriately, and integrating them with agentic AI workflows
 
 <br>
@@ -246,13 +248,12 @@ Follow the steps below to set up and run the application on your own machine. Th
 
 **Prerequisites**
 
-Make sure Node.js, Python 3, and Git are installed before you begin. You can check each by running the commands below, which should print a version number.
+Make sure Node.js and Python 3 are installed before you begin. You can check each by running the commands below, which should print a version number.
 
 > **Note:** On Windows, replace `python3` with `python` in the commands below.
 ```bash
 node --version
 python3 --version
-git --version
 ```
 
 <br>
