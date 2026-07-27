@@ -1,7 +1,7 @@
 # Overhacked backend
 ## Requirements
 
-- Python 3.10–3.13 (crewai does not yet support 3.14+; if `python3 --version` reports 3.14 or higher, use an older interpreter, e.g. `python3.12`, when creating the virtual environment below)
+- Python 3.10+
 - See `requirements.txt` for full dependencies.
 
 ## Setup
