@@ -32,8 +32,8 @@ export default class DragAndDropContents {
   mount() {
     const s = this.scene;
 
-    const { data, loading, error } = useCodingQuizStore.getState();
-    if (loading || error || !data) {
+    const { data, loading } = useCodingQuizStore.getState();
+    if (loading || !data) {
       const txt = s.add.text(0, 0, "Loading question...", {
         fontFamily: "Silkscreen",
         fontSize: "32px",
@@ -80,9 +80,12 @@ export default class DragAndDropContents {
     const startX = 25; // left column
     const startY = 200;
 
-    const destX = 525; // right column
+    const gap = 24;
+    const usableW = this.contentW - startX - gap;
+    const cardsW = Math.floor(usableW * 0.47); // left (cards) column
+    const areaW = usableW - cardsW; // right (destination) column, wider than cards
+    const destX = startX + cardsW + gap; // right column
     const destY = startY;
-    const areaW = 500;
     const areaH = 600;
 
     // Destination area
@@ -106,8 +109,9 @@ export default class DragAndDropContents {
     // SUBMIT BUTTON
     // -------------------------
     const submitY = destY + areaH + 30;
+    const submitW = Math.min(160, areaW - 20);
     const submitRect = s.add
-      .rectangle(destX + areaW / 2, submitY, 250, 76, 0x000000, 0.14)
+      .rectangle(destX + areaW / 2, submitY, submitW, 52, 0x000000, 0.14)
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
@@ -115,7 +119,7 @@ export default class DragAndDropContents {
       .text(destX + areaW / 2, submitY, "Submit", {
         fontFamily: "Silkscreen",
         fontStyle: "bold",
-        fontSize: "28px",
+        fontSize: "20px",
         color: "#4A3F35",
       })
       .setOrigin(0.5);
@@ -144,7 +148,7 @@ export default class DragAndDropContents {
 
     const cards = this.shuffleArray(originalCards);
 
-    const cardW = 450;
+    const cardW = cardsW - 10;
     const cardH = 30;
     const cardGap = 10;
 

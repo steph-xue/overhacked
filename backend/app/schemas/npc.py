@@ -13,13 +13,6 @@ class NPCInteractRequest(BaseModel):
     session_id: str
     npc_name: str
     
-# The MC Question response we get back from the NPC after the initial player interaction
-class MCQResponse(BaseModel):
-    question: str
-    choices: List[str]
-    answer: int
-    hints: List[str]
-
 class MCQRequest(BaseModel):
     # session_id: str??
     username: str
@@ -54,12 +47,6 @@ class DragDropQuestion(BaseModel):
     question_text: str
     items_to_drag: List[str]
     drop_zones: List[str]
-    
-# The response provided back from the NPC after the player completes the Drag and Drop question
-class DragDropResponse(BaseModel):
-    is_correct: bool
-    correct_mapping: Optional[dict] = None
-    explanation: Optional[str] = None
 
 # The Debugging Question response we get back from the NPC after the initial player interaction
 class DebuggingResponse(BaseModel):
@@ -78,6 +65,6 @@ class MCQItem(BaseModel):
     choices: List[str]
     answer: int
 
-class MCQResponse2(BaseModel):
+class MCQResponse(BaseModel):
     quizzes: List[MCQItem]
     hints: List[List[str]]

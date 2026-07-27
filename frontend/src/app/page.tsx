@@ -9,7 +9,7 @@ const silkscreen = Silkscreen({
 export default function Home() {
   return (
     <main className="h-screen flex flex-col items-center justify-center text-black">
-      <h1 className={`text-8xl font-bold mb-6 ${silkscreen.className} text-[#4A3F35]`}>
+      <h1 className={`text-6xl font-bold mb-6 ${silkscreen.className} text-[#4A3F35]`}>
         Overhacked
       </h1>
       <StartHackingButton />

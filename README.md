@@ -64,9 +64,9 @@ Serves as the entry point to the game, designed with a clean, simple UI to quick
 
 ### User Form
 Before entering the game, players fill out a form with the following information, which is passed to the backend to power adaptive gameplay:
-- **Username**, displayed above the player's character in-game
-- **Years of programming experience**, used by the agentic AI to adjust minigame question difficulty
-- **Favourite programming language**, used to tailor minigame question generation
+- **Username**: Displayed above the player's character in-game
+- **Years of Experience**: Used by the agentic AI to adjust minigame question difficulty
+- **Favourite Language (Object Oriented)**: Used to tailor minigame question generation and defaults to Java if the entered language isn't object oriented
 
 <p align="center">
   <img src="docs/screenshots/user-form.png" alt="user-form" width="500"/>
@@ -197,13 +197,15 @@ Triggered when the two-minute timer runs out before the progress bar is filled, 
 The frontend is built with Next.js and React, with the core gameplay rendered through Phaser. The player and each NPC are rendered from individual sprite sheets, switching between walking and idle animations based on which arrow keys are held down. Tables and walls act as physical colliders, so the player is blocked from passing through them rather than simply overlapping visually. To detect when the player is close enough to talk to a teammate, the scene continuously measures the distance between the player and each NPC, and once that distance is small enough, it displays a prompt to press E and launches that NPC's minigame. Several Zustand stores hold state across the game, one for the user's form details, one for each minigame's questions and hints, and one for tracking which NPC the player is currently interacting with.
 
 ### Requesting a Minigame Question
-When a player fills out the form at the start of the game, their name, years of experience, and favourite language are saved to a Zustand store and carried with them for the rest of the session. Walking up to a teammate NPC and pressing E triggers a request from the frontend to the FastAPI backend, sent as a POST request with the player's stored name, experience, and language as the payload.
+When a player fills out the form at the start of the game, their name, years of experience, and favourite language (object oriented) are saved to a Zustand store and carried with them for the rest of the session. Walking up to a teammate NPC and pressing E triggers a request from the frontend to the FastAPI backend, sent as a POST request with the player's stored name, experience, and language as the payload. The game waits until the question has actually been fetched before opening the minigame dialog, displaying a loading screen in the meantime rather than any placeholder content. If the request fails, the frontend immediately falls back to a locally stored sample question so gameplay isn't blocked, while silently retrying the request in the background. If that retry succeeds, the real personalized question quietly replaces the fallback for the next minigame interaction.
 
 ### Generating a Question with Agentic AI
-Each minigame has its own API route on the backend, and both routes use CrewAI to build two specialized agents that work together to generate content for each round:
+Each minigame has its own API route on the backend, and both routes use CrewAI to build two specialized types of agents that work together to generate content for each round:
 
 - **Quiz Creator Agents** generate a personalized question, powered by OpenAI's GPT-4o model, tailored to the player's experience level and preferred programming language to adapt the difficulty of the minigame to their skill level.
 - **Hint Agents** generate a series of contextual hints for that same question, helping players understand the underlying concepts without giving away the answer directly.
+
+Before generating content, the Quiz Creator Agent first determines whether the player's chosen language is a real, recognized object-oriented language. If it is, the question is written using that language's specific syntax and terminology. If the language isn't object-oriented or isn't recognized, the agent defaults to Java instead.
 
 For the multiple choice route, the Quiz Creator Agent produces a trivia style question with four answer choices, testing object oriented programming concepts. For the drag and drop route, it instead produces a short, reorderable snippet of code testing the same kinds of concepts. Both agents' output is combined and returned as a single JSON response, which is parsed and validated against a Pydantic schema before being sent back to the frontend.
 
@@ -248,12 +250,12 @@ Follow the steps below to set up and run the application on your own machine. Th
 
 **Prerequisites**
 
-Make sure Node.js and Python 3 are installed before you begin. You can check each by running the commands below, which should print a version number.
+Make sure Node.js and Python 3.10–3.13 are installed before you begin (required by crewai which doesn't support 3.14+ yet). You can check each by running the commands below, which should print a version number. The Python command uses 3.12 as an example, but any version in that range works.
 
-> **Note:** On Windows, replace `python3` with `python` in the commands below.
+> **Note:** On Windows, replace `python3.12` with `python` in the commands below.
 ```bash
 node --version
-python3 --version
+python3.12 --version
 ```
 
 <br>
@@ -278,7 +280,7 @@ OPENAI_API_KEY=your_openai_api_key_here
 From the project root, move into the backend folder and create a Python virtual environment.
 ```bash
 cd backend
-python3 -m venv venv
+python3.12 -m venv venv
 source venv/bin/activate      # On Windows use: venv\Scripts\activate
 ```
 

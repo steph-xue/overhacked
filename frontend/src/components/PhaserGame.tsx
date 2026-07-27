@@ -79,7 +79,7 @@ export default function PhaserGame() {
 
       <div
         ref={containerRef}
-        className="shrink-0 w-[75vw] max-w-[1100px] aspect-[16/9]"
+        className="shrink-0 w-[65vw] max-w-[950px] aspect-[16/9]"
       />
     </div>
   );

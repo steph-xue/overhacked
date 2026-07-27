@@ -23,7 +23,7 @@ type MCStore = {
   resetQuizProgress: () => void;
 };
 
-const defaultData: MCQResponse = {
+const fallbackData: MCQResponse = {
   quizzes: [
     {
       question: "What is Java primarily used for?",
@@ -76,48 +76,56 @@ const defaultData: MCQResponse = {
   ],
 };
 
+async function requestMCQs(): Promise<MCQResponse> {
+  const { name, yearsOfExperience, favouriteLanguage } =
+    useUserStore.getState();
+
+  const response = await fetch(`${API_BASE_URL}/mcq`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: name,
+      experience: yearsOfExperience,
+      language: favouriteLanguage,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch MCQs");
+  }
+
+  return response.json();
+}
+
 export const useMCStore = create<MCStore>((set, get) => ({
-  data: defaultData, // ← initialize with defaults
+  data: null,
   loading: false,
   error: null,
   currentIndex: 0,
 
   fetchMCQs: async () => {
-    const { name, yearsOfExperience, favouriteLanguage } =
-      useUserStore.getState();
-
     set({ loading: true, error: null });
 
     try {
-      const response = await fetch(`${API_BASE_URL}/mcq2`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: name,
-          experience: yearsOfExperience,
-          language: favouriteLanguage,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch MCQs");
-      }
-
-      const data: MCQResponse = await response.json();
-      set({
-        data,
-        currentIndex: 0,
-        loading: false,
-      });
+      const data = await requestMCQs();
+      set({ data, currentIndex: 0, loading: false });
     } catch (err) {
-      console.error("Fetch failed, using default quizzes:", err);
+      console.error("Failed to fetch MCQs, using fallback quizzes:", err);
 
       set({
-        data: defaultData, // ← fallback
+        data: fallbackData,
         currentIndex: 0,
         error: err instanceof Error ? err.message : "Unknown error",
         loading: false,
       });
+
+      // Retry once in the background so the real, personalized questions
+      // can replace the fallback without blocking gameplay on them.
+      requestMCQs()
+        .then((data) => set({ data, currentIndex: 0, error: null }))
+        .catch(() => {
+          // keep showing the fallback
+        });
     }
   },
 

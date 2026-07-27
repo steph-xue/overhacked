@@ -404,7 +404,7 @@ export default class HackathonScene extends Phaser.Scene {
     this.scoreBoard.setProgress(0);
 
     // Drag-and-Drop
-    // useDragDropStore.getState().fetchDragDropData();
+    // useCodingQuizStore.getState().fetchDragDropData();
 
     // Mentor guide at beginning of game
     this.mentorGuide = new MentorGuide(this);
@@ -622,7 +622,7 @@ export default class HackathonScene extends Phaser.Scene {
     if (!Phaser.Input.Keyboard.JustDown(this.keyE)) return;
 
     if (this.nearNpc.game === "multipleChoice") {
-      this.openMultipleChoiceDialog();
+      void this.openMultipleChoiceDialog();
     } else {
       void this.openDragAndDropDialog();
     }
@@ -832,12 +832,6 @@ export default class HackathonScene extends Phaser.Scene {
       // if user canceled / walked away, ignore
       if (myToken !== this.npcFetchToken) return;
 
-      // transient failure (rate limit, network blip) - silently retry once
-      if (!useCodingQuizStore.getState().data) {
-        await useCodingQuizStore.getState().fetchCodingQuiz();
-        if (myToken !== this.npcFetchToken) return;
-      }
-
       this.hideLoading();
       this.dialog.show("dragAndDrop");
     } catch (e) {
@@ -862,9 +856,45 @@ export default class HackathonScene extends Phaser.Scene {
     this.bg.setScale(Math.min(w / img.width, h / img.height));
   }
 
-  private openMultipleChoiceDialog() {
-    const mcStore = useMCStore.getState();
-    const result = mcStore.nextQuiz();
+  private waitForMCFetch(): Promise<void> {
+    return new Promise((resolve) => {
+      const unsubscribe = useMCStore.subscribe((state) => {
+        if (!state.loading) {
+          unsubscribe();
+          resolve();
+        }
+      });
+    });
+  }
+
+  private async openMultipleChoiceDialog() {
+    const store = useMCStore.getState();
+
+    if (!store.data) {
+      this.showLoading();
+      const myToken = ++this.npcFetchToken;
+
+      try {
+        if (store.loading) {
+          await this.waitForMCFetch();
+        } else {
+          await useMCStore.getState().fetchMCQs();
+        }
+
+        // if user canceled / walked away, ignore
+        if (myToken !== this.npcFetchToken) return;
+
+        this.hideLoading();
+      } catch (e) {
+        if (myToken !== this.npcFetchToken) return;
+
+        console.error(e);
+        this.hideLoading();
+        return;
+      }
+    }
+
+    const result = useMCStore.getState().nextQuiz();
 
     if (!result) return;
 

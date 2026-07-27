@@ -25,18 +25,28 @@ async def ask_agent(request: CodingQuizRequest) -> CodingQuizResponse:
     username = request.username
     
     coding_quiz_agent = Agent(
-        role=f"You are a specialist in computer science, and you are tasked with creating a coding quiz of {language} which is challenging but doable for a person who has {experience} years of experience in tech.",
-        goal=f"Create ONE coding quiz which is of appropriate difficulty for a person who has {experience} years of experience in tech.",
+        role=f"""
+        You are a specialist in computer science, and you are tasked with creating a coding quiz that tests Object-Oriented Programming (OOP) concepts through a class-structuring exercise, which is challenging but doable for a person who has {experience} years of experience in tech.
+
+        First, determine whether {language} is a real, recognized object-oriented programming language.
+        - If {language} is clearly a real object-oriented language, write the coding quiz in {language}, using its specific syntax.
+        - If {language} is clearly not object-oriented, or is not a real, recognized programming language at all, write the coding quiz in Java instead, since {language} does not have real class/OOP syntax to build a meaningful exercise out of.
+
+        Do not invent or assume syntax that doesn't actually exist in the language you end up writing the code in.
+
+        After drafting the code, count the number of lines in your "answer" array (each element counts as one line, including lines that are only a closing parenthesis, bracket, or brace). If the count is outside the 8 to 12 line range, shorten or rewrite the code (for example, by reducing the number of fields or keeping lines from wrapping) until it fits, before finalizing your response.
+        """,
+        goal=f"Create ONE coding quiz which is of appropriate difficulty for a person who has {experience} years of experience in tech, count the lines in your answer before finalizing to confirm it is between 8 and 12 lines, and verify the code is syntactically valid.",
         llm=llm,
         backstory="You're working on education in computer science and are familiar with Object-Oriented-Programming. At the same time, you're good at creating quizzes for students who are learning OOP.",
     )
-    
+
     coding_quiz_task = Task(
-        description=f"Create a coding quiz of {language} which is challenging but doable for a person who has {experience} years of experience in tech.",
+        description=f"Create a coding quiz testing OOP concepts, in {language} if {language} is a real object-oriented language, or in Java otherwise, which is challenging but doable for a person who has {experience} years of experience in tech.",
         expected_output=f"""Always respond in **valid JSON only** with exactly two fields:
         1. "question": a string containing the quiz question.
         2. "answer": an array of strings, each string is one line of code or text, preserving all indentation, spaces, and formatting exactly.
-        Ensure the "answer" array contains fewer than 15 lines total and includes no comments and no empty lines. Ensure each line is less than 30 characters long including spaces.
+        Ensure the "answer" array contains between 8 and 12 lines total (including lines that are only a closing parenthesis, bracket, or brace) and includes no comments and no empty lines. Ensure each line is less than 30 characters long including spaces.
         Example:
         {{
             "question": "Write a Java class Car with fields brand, model, year, constructor, and displayDetails method.",
