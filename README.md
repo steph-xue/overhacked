@@ -186,7 +186,7 @@ Triggered when the two-minute timer runs out before the progress bar is filled, 
 | Frontend | Next.js, React, TypeScript, Tailwind CSS |
 | Backend | FastAPI, Python |
 | Libraries | CrewAI (builds and runs the quiz and hint generating AI agents),<br>LangChain (connects the AI agents to OpenAI's models),<br>Zustand (manages state across the game's stores),<br>React Confetti (displays the win animation) |
-| APIs | OpenAI API (generates personalized quiz questions and contexual hints based on the years of experience and favourite language entered) |
+| APIs | OpenAI API (generates personalized quiz questions and contextual hints based on the years of experience and favourite language entered) |
 | Deployment | Render |
 
 <br>
