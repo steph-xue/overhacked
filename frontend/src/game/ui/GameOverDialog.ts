@@ -7,10 +7,12 @@ export default class GameOverDialog {
 
   private objects: Phaser.GameObjects.GameObject[] = [];
 
+  // Store the scene this dialog will render into
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
   }
 
+  // Render the game over panel with restart and quit buttons
   mount(args?: { onRestart?: () => void; onQuit?: () => void }) {
     const s = this.scene;
     const { width, height } = s.scale;
@@ -63,7 +65,7 @@ export default class GameOverDialog {
       .setOrigin(0.5, 0.5)
       .setResolution(2);
 
-    // ✅ IMPORTANT: Add background pieces first (so buttons can appear on top)
+    // Add background pieces first, so buttons can appear on top
     this.root.add([overlay, panel, border, title, subtitle]);
     this.objects.push(overlay, panel, border, title, subtitle);
 
@@ -75,6 +77,7 @@ export default class GameOverDialog {
     const BUTTON_Y = PANEL_H / 2 - 90;
     const GAP = 34;
 
+    // Create a clickable rectangle-and-label button at the given x offset
     const createButton = (x: number, label: string, onClick: () => void) => {
       // Button bg
       const rect = s.add
@@ -115,6 +118,7 @@ export default class GameOverDialog {
     s.scale.on("resize", this.onResize, this);
   }
 
+  // Destroy all rendered objects and detach the resize listener
   unmount() {
     this.scene.scale.off("resize", this.onResize, this);
 
@@ -124,6 +128,7 @@ export default class GameOverDialog {
     this.root?.destroy();
   }
 
+  // Re-center the dialog when the game canvas is resized
   private onResize() {
     const { width, height } = this.scene.scale;
     if (this.root) this.root.setPosition(width / 2, height / 2);

@@ -51,6 +51,7 @@ export default class MiniGameDialog {
     null;
   private hintContent: HintContent | null = null;
 
+  // Maps each dialog content type to a factory that builds its mountable content
   private registry: Record<
     DialogContentType,
     (payload?: DialogPayload) => { mount: () => void; unmount: () => void }
@@ -75,6 +76,7 @@ export default class MiniGameDialog {
       ),
   };
 
+  // Build the dialog shell and rebuild it whenever the game canvas is resized
   constructor(
     scene: Phaser.Scene,
     opts?: { width?: number; height?: number; depth?: number; bgHex?: string }
@@ -109,10 +111,12 @@ export default class MiniGameDialog {
     });
   }
 
+  // Whether the dialog is currently visible
   isOpen() {
     return this.open;
   }
 
+  // Mount the given minigame content and its matching hint panel, then reveal the dialog
   show(type: DialogContentType, payload?: DialogPayload) {
     this.currentType = type;
 
@@ -149,6 +153,7 @@ export default class MiniGameDialog {
     this.ui.setActive(true);
   }
 
+  // Unmount the active content and hide the dialog
   hide() {
     this.unmountAll();
 
@@ -232,6 +237,7 @@ export default class MiniGameDialog {
     this.ui.setDepth(depth);
   }
 
+  // Center the dialog shell within the current game canvas
   private position() {
     const w = this.scene.scale.width;
     const h = this.scene.scale.height;
@@ -245,12 +251,14 @@ export default class MiniGameDialog {
     return this.panelH - this.PAD * 2;
   }
 
+  // Width of the left main content column
   private getMainContentWidth() {
     const innerW = this.panelW - this.PAD * 2;
     const leftW = Math.floor(innerW * this.MAIN_RATIO);
     return leftW;
   }
 
+  // Width of the right hint column
   private getHintWidth() {
     const innerW = this.panelW - this.PAD * 2;
     const leftW = Math.floor(innerW * this.MAIN_RATIO);
@@ -258,6 +266,7 @@ export default class MiniGameDialog {
     return rightW;
   }
 
+  // Unmount the active content and hint panel, then clear their containers
   private unmountAll() {
     if (this.activeContent) {
       this.activeContent.unmount();
@@ -273,6 +282,7 @@ export default class MiniGameDialog {
     this.hintRoot?.removeAll(true);
   }
 
+  // Convert a "#RRGGBB" hex string to a numeric color value
   private static hexToNumber(hex: string): number {
     return parseInt(hex.replace("#", ""), 16);
   }

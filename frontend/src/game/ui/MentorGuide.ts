@@ -5,12 +5,15 @@ export default class MentorGuide {
   private root!: Phaser.GameObjects.Container;
   private objects: Phaser.GameObjects.GameObject[] = [];
 
+  // Bound resize handler so it can be added and removed from the same listener
   private onResizeBound = () => this.reposition();
 
+  // Store the scene this guide will render into
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
   }
 
+  // Show a mentor message bubble that auto-hides after durationMs
   show(args: { message: string; durationMs?: number }) {
     const s = this.scene;
 
@@ -99,6 +102,7 @@ export default class MentorGuide {
     s.scale.on("resize", this.onResizeBound);
   }
 
+  // Fade out and destroy the mentor message bubble
   hide() {
     if (!this.root) return;
 
@@ -121,6 +125,7 @@ export default class MentorGuide {
     });
   }
 
+  // Position the bubble in the bottom-right corner, relative to the current canvas size
   private reposition(startOffscreen = false) {
     if (!this.root) return;
 

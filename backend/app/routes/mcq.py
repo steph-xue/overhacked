@@ -18,6 +18,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 # Define the LLM
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0.5)
 
+# Send a prompt to the AI agent and return its generated quiz and hints
 @mcq_router.post("/mcq")
 async def ask_agent(request: MCQRequest) -> MCQResponse:
     language = request.language
@@ -108,9 +109,6 @@ async def ask_agent(request: MCQRequest) -> MCQResponse:
         process=Process.sequential
     )
 
-    """
-    Send a prompt to the AI agent and get a response.
-    """
     try:
         # Call CrewAI API
         result = multiple_quiz_crew.kickoff({"topic": "Create a multiple choice quiz"})
@@ -119,7 +117,7 @@ async def ask_agent(request: MCQRequest) -> MCQResponse:
 
         print("result raw")
         print(result.tasks_output[0].raw)
-        # result.tasks is a list of task results in order
+        # tasks_output holds each task's result, in the order the tasks were run
         quiz_task_result = result.tasks_output[0].raw  # multiple_quiz_task
         hints_task_result = result.tasks_output[1].raw  # multiple_quiz_hints_task
 

@@ -19,6 +19,7 @@ export default class HintContent {
     "Hint 2: Inheritance is when a class reuses fields/methods from another (like extends in Java).",
   ];
 
+  // Store the scene, container, dimensions, and hints this panel will display
   constructor(args: {
     scene: Phaser.Scene;
     root: Phaser.GameObjects.Container;
@@ -33,6 +34,7 @@ export default class HintContent {
     this.hints = args.hints ?? [];
   }
 
+  // Render the mentor sprite and hint panel, clickable to reveal the next hint
   mount() {
     const s = this.scene;
 
@@ -126,15 +128,17 @@ export default class HintContent {
     this.objects.push(bg, border, title, mentorSprite, clickPrompt, hint);
   }
 
+  // Display the next hint in the list, wrapping back to the first after the last
   private showNextHint() {
     if (!this.hintTextObj) return;
 
     this.hintTextObj.setText(this.hints[this.hintIndex]);
 
-    // alternate 0 -> 1 -> 0 -> 1 ...
+    // Alternate 0 -> 1 -> 0 -> 1 ...
     this.hintIndex = (this.hintIndex + 1) % this.hints.length;
   }
 
+  // Destroy all rendered objects and reset local state
   unmount() {
     this.objects.forEach((o) => o.destroy());
     this.objects = [];

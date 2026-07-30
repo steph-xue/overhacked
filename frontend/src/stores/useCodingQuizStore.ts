@@ -40,6 +40,7 @@ const fallbackData: CodingQuizResponse = {
   ],
 };
 
+// Fetch a personalized coding quiz from the backend
 async function requestCodingQuiz(): Promise<CodingQuizResponse> {
   const { name, yearsOfExperience, favouriteLanguage } =
     useUserStore.getState();
@@ -66,6 +67,7 @@ export const useCodingQuizStore = create<CodingQuizStore>((set) => ({
   loading: false,
   error: null,
 
+  // Fetch a coding quiz and fall back to a sample question on failure
   fetchCodingQuiz: async () => {
     set({ loading: true, error: null });
 
@@ -82,15 +84,16 @@ export const useCodingQuizStore = create<CodingQuizStore>((set) => ({
       });
 
       // Retry once in the background so the real, personalized question
-      // can replace the fallback without blocking gameplay on it.
+      // can replace the fallback without blocking gameplay on it
       requestCodingQuiz()
         .then((data) => set({ data, error: null }))
         .catch(() => {
-          // keep showing the fallback
+          // Keep showing the fallback
         });
     }
   },
 
+  // Clear the stored quiz data back to its initial state
   reset: () => {
     set({ data: null, loading: false, error: null });
   },

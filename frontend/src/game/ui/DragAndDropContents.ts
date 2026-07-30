@@ -16,7 +16,7 @@ export default class DragAndDropContents {
   private onAnswer?: (isCorrect: boolean) => void;
   private destArea?: Phaser.GameObjects.Rectangle;
 
-
+  // Store the scene, container, and content width shared with the other minigame content classes
   constructor(
     scene: Phaser.Scene,
     root: Phaser.GameObjects.Container,
@@ -29,6 +29,7 @@ export default class DragAndDropContents {
     this.onAnswer = onAnswer;
   }
 
+  // Render the drag-and-drop question, cards, and drop zone into the dialog
   mount() {
     const s = this.scene;
 
@@ -77,14 +78,14 @@ export default class DragAndDropContents {
     // -------------------------
     // AREAS (side-by-side layout: left = start, right = destination)
     // -------------------------
-    const startX = 25; // left column
+    const startX = 25; // Left column
     const startY = 200;
 
     const gap = 24;
     const usableW = this.contentW - startX - gap;
-    const cardsW = Math.floor(usableW * 0.47); // left (cards) column
-    const areaW = usableW - cardsW; // right (destination) column, wider than cards
-    const destX = startX + cardsW + gap; // right column
+    const cardsW = Math.floor(usableW * 0.47); // Left (cards) column
+    const areaW = usableW - cardsW; // Right (destination) column, wider than cards
+    const destX = startX + cardsW + gap; // Right column
     const destY = startY;
     const areaH = 600;
 
@@ -136,12 +137,12 @@ export default class DragAndDropContents {
     // CARDS (vertical stack on the left)
     // -------------------------
     const originalCards = answer.map((label: string) => {
-      // generate a pale color
+      // Generate a pale color
       const r = 200 + Math.floor(Math.random() * 56); // 200-255
       const g = 200 + Math.floor(Math.random() * 56); // 200-255
       const b = 200 + Math.floor(Math.random() * 56); // 200-255
 
-      const color = (r << 16) + (g << 8) + b; // convert RGB to hex number
+      const color = (r << 16) + (g << 8) + b; // Convert RGB to hex number
 
       return { label, color };
     });
@@ -209,6 +210,7 @@ export default class DragAndDropContents {
     });
   }
 
+  // Return the labels of the cards currently placed in the drop zone, top to bottom
   getFinalOrder(): string[] {
     const sorted = [...this.cardData]
       .filter((c) => c.inDropZone)
@@ -218,6 +220,7 @@ export default class DragAndDropContents {
     return sorted;
   }
 
+  // Check the submitted card order against the correct answer and notify listeners
   private submit() {
   const finalOrder = this.getFinalOrder();
   const { data } = useCodingQuizStore.getState();
@@ -236,7 +239,7 @@ export default class DragAndDropContents {
 
     // Flash green or red
   if (this.destArea) {
-    const color = isCorrect ? 0x4ade80 : 0xf87171; // green : red
+    const color = isCorrect ? 0x4ade80 : 0xf87171; // Green : red
     this.destArea.setFillStyle(color, 0.4);
   }
   
@@ -246,6 +249,7 @@ export default class DragAndDropContents {
   this.onAnswer?.(isCorrect);
 }
 
+  // Return a copy of the array in randomized order
   private shuffleArray<T>(array: T[]): T[] {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -255,12 +259,14 @@ export default class DragAndDropContents {
     return shuffled;
   }
 
+  // Check whether the submitted order exactly matches the correct order
   private isCorrectOrder(submitted: string[], correct: string[]): boolean {
     if (submitted.length !== correct.length) return false;
 
     return submitted.every((value, index) => value === correct[index]);
   }
 
+  // Destroy all rendered objects and reset local state
   unmount() {
     this.objects.forEach((obj) => obj.destroy());
     this.objects = [];

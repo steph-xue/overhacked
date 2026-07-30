@@ -15,6 +15,7 @@ const useUserStore = create<UserStore>((set) => ({
   name: "",
   yearsOfExperience: 1,
   favouriteLanguage: "",
+  // Store the player's form details for the rest of the session
   setUser: (data) => set(data),
 }));
 

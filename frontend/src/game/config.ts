@@ -1,9 +1,10 @@
 import type Phaser from "phaser";
 
+// Build the Phaser game config, loading Phaser and the game scene client-side only
 export async function createGameConfig(
   parent: HTMLElement
 ): Promise<Phaser.Types.Core.GameConfig> {
-  //  Load Phaser only in the browser
+  // Load Phaser only in the browser
   const PhaserMod = await import("phaser");
   const PhaserNS = (PhaserMod.default ?? PhaserMod) as typeof PhaserMod;
 

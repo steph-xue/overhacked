@@ -6,6 +6,7 @@ const silkscreen = Silkscreen({
   weight: ["400", "700"],
 });
 
+// Landing page shown before the player starts the game
 export default function Home() {
   return (
     <main className="h-screen flex flex-col items-center justify-center text-black">

@@ -1,39 +1,46 @@
 # Overhacked Backend
 ## Requirements
-
-- Python 3.10–3.13 (required by crewai which doesn't support 3.14+ yet). The setup commands use 3.12 as an example, but any version in that range works.
+- Python 3.10–3.13 (required by crewai 1.8.1 which doesn't support Python 3.14+).
 - See `requirements.txt` for full dependencies.
 
 ## Setup
-### 1. Clone the repository
+
+**1. Clone the Repository**
+
+This downloads a copy of the project to your computer and moves you into the backend folder.
 ```bash
 git clone https://github.com/steph-xue/overhacked.git
-cd backend
+cd overhacked/backend
 ```
 
-### 2. Create a virtual environment
-> **Note:** On Windows, replace `python3.12` with `python` in the commands below.
+**2. Create and Activate a Python Virtual Environment**
+This keeps the project's dependencies separate from other Python projects on your machine.
 ```bash
-python3.12 -m venv venv
-source venv/bin/activate      # On Windows use: venv\Scripts\activate
+python3 -m venv .venv       # On Windows use: python -m venv .venv
+source .venv/bin/activate   # On Windows use: .venv\Scripts\activate
 ```
 
-### 3. Install dependencies
+**3. Install the Dependencies**
+
+This installs all dependencies the backend needs to run.
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Set environment variables
-Create a .env file in the root folder:
+**4. Set Up Environment Variables**
+
+Create a `.env` file in the backend folder with your OpenAI API key.
 ```bash
-OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here  # OpenAI API key
 ```
 
-### 5. Run the server
+**5. Start the Development Server**
+
+This runs the FastAPI backend developement server using Uvicorn.
 ```bash
 uvicorn main:app --reload --port 8000
 ```
-The server will start at: http://127.0.0.1:8000
+The server will be available at `http://127.0.0.1:8000`.
 
 ## API Endpoints
 ### 1. Root (Test)

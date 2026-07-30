@@ -92,13 +92,13 @@ export default class HackathonScene extends Phaser.Scene {
   private lastIdleNudgeAt = 0;
   private lastRandomAlertAt = 0;
 
-    // tune these
-    private readonly IDLE_THRESHOLD_MS = 15_000;       // idle for 15s
-    private readonly IDLE_NUDGE_COOLDOWN_MS = 15_000;  // don't spam
+    // Tune these
+    private readonly IDLE_THRESHOLD_MS = 15_000;       // Idle for 15s
+    private readonly IDLE_NUDGE_COOLDOWN_MS = 15_000;  // Don't spam
 
-    private readonly ALERT_MIN_MS = 5_000;            // random alert window
+    private readonly ALERT_MIN_MS = 5_000;            // Random alert window
     private readonly ALERT_MAX_MS = 35_000;
-    private readonly RANDOM_ALERT_CHANCE = 0.80;       // chance per roll
+    private readonly RANDOM_ALERT_CHANCE = 0.80;       // Chance per roll
     private readonly RANDOM_ALERT_COOLDOWN_MS = 20_000;
 
   private randomAlertTimer?: Phaser.Time.TimerEvent;
@@ -111,6 +111,7 @@ export default class HackathonScene extends Phaser.Scene {
   // Track last facing direction (future-proofing for directional idle)
   private lastDir: "down" | "left" | "right" | "up" = "down";
 
+  // Register this scene with Phaser under the "HackathonScene" key
   constructor() {
     super("HackathonScene");
   }
@@ -330,7 +331,7 @@ export default class HackathonScene extends Phaser.Scene {
           .setVisible(false);
       
         // Scale icon to match your world (NPCs are scale 6)
-        const SCALE_FACTOR = npc.sprite.scaleX * 0.75; // tweak: 0.6–1.0
+        const SCALE_FACTOR = npc.sprite.scaleX * 0.75; // Tweak: 0.6–1.0
         icon.setDisplaySize(10 * SCALE_FACTOR, 10 * SCALE_FACTOR);
       
         icon.play("npc-exclaim-anim");
@@ -444,6 +445,7 @@ export default class HackathonScene extends Phaser.Scene {
     this.scoreBoard.setProgress(this.progress);
   }
 
+  // Increase overall progress and trigger the win dialog once it's full
   private addProgress(delta: number) {
     if (this.hasWon) return;
 
@@ -574,6 +576,7 @@ export default class HackathonScene extends Phaser.Scene {
   //     console.log(data);
   //   }
 
+  // Create an NPC sprite at the given position and start its idle animation
   private spawnNpc(x: number, y: number, key: string) {
     const npc = this.add.sprite(x, y, key, 0).setOrigin(0.5, 1).setScale(6);
     npc.setDepth(5);
@@ -581,6 +584,7 @@ export default class HackathonScene extends Phaser.Scene {
     return npc;
   }
 
+  // Find the nearest NPC within talk range, show the talk prompt, and open its dialog on E
   private updateNpcInteraction() {
     const TALK_RADIUS = 200;
     let closest: {
@@ -611,14 +615,14 @@ export default class HackathonScene extends Phaser.Scene {
       return;
     }
 
-    // show prompt while near
+    // Show prompt while near
     this.talkPrompt.setVisible(true);
     this.talkPrompt.setPosition(
       this.nearNpc.sprite.x,
       this.nearNpc.sprite.y - 125
     );
 
-    // only act on key press
+    // Only act on key press
     if (!Phaser.Input.Keyboard.JustDown(this.keyE)) return;
 
     if (this.nearNpc.game === "multipleChoice") {
@@ -628,17 +632,18 @@ export default class HackathonScene extends Phaser.Scene {
     }
   }
 
-  // Helper for creating randomized alerts - FOR TESTING
+  // Record the current time as the player's last active moment - FOR TESTING
   private markActive() {
     this.lastActiveAt = Date.now();
   }
 
+  // Schedule the next random NPC alert after a randomized delay, looping forever
   private scheduleRandomNpcAlerts() {
     const delay = Phaser.Math.Between(this.ALERT_MIN_MS, this.ALERT_MAX_MS);
 
     this.randomAlertTimer = this.time.delayedCall(delay, () => {
       this.tryRandomNpcAlert();
-      this.scheduleRandomNpcAlerts(); // loop forever
+      this.scheduleRandomNpcAlerts(); // Loop forever
     });
   }
 
@@ -669,8 +674,9 @@ export default class HackathonScene extends Phaser.Scene {
     });
   }
 
+  // Check whether it's safe to interrupt the player with an alert right now
   private canInterruptPlayer(): boolean {
-    // keep it polite — don't pop alerts over modal/dialog states
+    // Keep it polite — don't pop alerts over modal/dialog states
     if (this.dialog?.isOpen()) return false;
     if (this.loadingDialog) return false;
     if (this.winDialog) return false;
@@ -678,12 +684,14 @@ export default class HackathonScene extends Phaser.Scene {
     return true;
   }
 
+  // Pick a random NPC sprite from the list, or null if there are none
   private pickRandomNpc(): Phaser.GameObjects.Sprite | null {
     if (!this.npcs.length) return null;
     const i = Phaser.Math.Between(0, this.npcs.length - 1);
     return this.npcs[i].sprite;
   }
 
+  // Roll for a random NPC alert and, if it hits, ping the NPC and show the mentor message
   private tryRandomNpcAlert() {
     const now = Date.now();
     if (!this.canInterruptPlayer()) return;
@@ -713,6 +721,7 @@ export default class HackathonScene extends Phaser.Scene {
     });
   }
 
+  // Show a nudge message from the mentor if the player has been idle too long
   private tryIdleNudge() {
     const now = Date.now();
     if (!this.canInterruptPlayer()) return;
@@ -733,6 +742,7 @@ export default class HackathonScene extends Phaser.Scene {
   // Animations
   // =========================
 
+  // Create the player's idle and walk animations
   private createPlayerAnims() {
     this.anims.create({
       key: "player-idle",
@@ -756,6 +766,7 @@ export default class HackathonScene extends Phaser.Scene {
     });
   }
 
+  // Create the idle animation for each NPC sprite key
   private createNpcAnims() {
     ["npc1", "npc2", "npc3", "npc4", "npc5"].forEach((key) => {
       this.anims.create({
@@ -767,6 +778,7 @@ export default class HackathonScene extends Phaser.Scene {
     });
   }
 
+  // Create the mentor's idle animation, if it hasn't been created already
   private createMentorAnims() {
     if (this.anims.exists("mentor-idle")) return;
 
@@ -776,11 +788,12 @@ export default class HackathonScene extends Phaser.Scene {
         start: 0,
         end: 7,
       }),
-      frameRate: 6, // gentle idle motion
-      repeat: -1, // loop forever
+      frameRate: 6, // Gentle idle motion
+      repeat: -1, // Loop forever
     });
   }
 
+  // Show the loading dialog, wiring its close button to cancel the pending NPC fetch
   private showLoading() {
     if (this.loadingDialog) return;
 
@@ -790,16 +803,19 @@ export default class HackathonScene extends Phaser.Scene {
     });
   }
 
+  // Cancel any in-flight NPC data fetch and hide the loading dialog
   private cancelNpcLoading() {
-    this.npcFetchToken++; // invalidate in-flight fetch
-    this.hideLoading(); // close UI + unfreeze movement
+    this.npcFetchToken++; // Invalidate in-flight fetch
+    this.hideLoading(); // Close UI + unfreeze movement
   }
 
+  // Destroy the loading dialog, if one is currently shown
   private hideLoading() {
     this.loadingDialog?.destroy();
     this.loadingDialog = undefined;
   }
 
+  // Resolve once the coding quiz store finishes its current fetch
   private waitForCodingQuizFetch(): Promise<void> {
     return new Promise((resolve) => {
       const unsubscribe = useCodingQuizStore.subscribe((state) => {
@@ -811,6 +827,7 @@ export default class HackathonScene extends Phaser.Scene {
     });
   }
 
+  // Open the drag-and-drop dialog, fetching quiz data first if it isn't loaded yet
   private async openDragAndDropDialog() {
     const store = useCodingQuizStore.getState();
 
@@ -829,7 +846,7 @@ export default class HackathonScene extends Phaser.Scene {
         await useCodingQuizStore.getState().fetchCodingQuiz();
       }
 
-      // if user canceled / walked away, ignore
+      // If user canceled / walked away, ignore
       if (myToken !== this.npcFetchToken) return;
 
       this.hideLoading();
@@ -856,6 +873,7 @@ export default class HackathonScene extends Phaser.Scene {
     this.bg.setScale(Math.min(w / img.width, h / img.height));
   }
 
+  // Resolve once the multiple-choice store finishes its current fetch
   private waitForMCFetch(): Promise<void> {
     return new Promise((resolve) => {
       const unsubscribe = useMCStore.subscribe((state) => {
@@ -867,6 +885,7 @@ export default class HackathonScene extends Phaser.Scene {
     });
   }
 
+  // Open the multiple-choice dialog, fetching quiz data first if it isn't loaded yet
   private async openMultipleChoiceDialog() {
     const store = useMCStore.getState();
 
@@ -881,7 +900,7 @@ export default class HackathonScene extends Phaser.Scene {
           await useMCStore.getState().fetchMCQs();
         }
 
-        // if user canceled / walked away, ignore
+        // If user canceled / walked away, ignore
         if (myToken !== this.npcFetchToken) return;
 
         this.hideLoading();
@@ -904,6 +923,7 @@ export default class HackathonScene extends Phaser.Scene {
     });
   }
 
+  // Tear down mounted UI and stop audio/listeners when the scene shuts down
   shutdown() {
     this.scoreBoard?.unmount();
     this.gameOver?.unmount();

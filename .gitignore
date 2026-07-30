@@ -1,24 +1,23 @@
-# dependencies
+# Dependencies
 node_modules/
-frontend/node_modules/
 
-# next.js
-.next/
-frontend/.next/
-frontend/out/
+# Virtual environments
+.venv/
 
-# env
+# Environment variables
 .env*
 
-# Python compiled files
+# Build and generated files
+.next/
+frontend/out/
+*.tsbuildinfo
+
+# Cache and compiled files
 __pycache__/
 *.py[cod]
 
-# Virtual environment
-venv/
+# Logs
+npm-debug.log*
 
-# TypeScript build info
-*.tsbuildinfo
-
-# OS files
+# Operating system files
 .DS_Store

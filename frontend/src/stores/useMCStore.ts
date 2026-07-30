@@ -76,6 +76,7 @@ const fallbackData: MCQResponse = {
   ],
 };
 
+// Fetch personalized multiple choice questions from the backend
 async function requestMCQs(): Promise<MCQResponse> {
   const { name, yearsOfExperience, favouriteLanguage } =
     useUserStore.getState();
@@ -103,6 +104,7 @@ export const useMCStore = create<MCStore>((set, get) => ({
   error: null,
   currentIndex: 0,
 
+  // Fetch multiple choice questions and fall back to sample quizzes on failure
   fetchMCQs: async () => {
     set({ loading: true, error: null });
 
@@ -120,15 +122,16 @@ export const useMCStore = create<MCStore>((set, get) => ({
       });
 
       // Retry once in the background so the real, personalized questions
-      // can replace the fallback without blocking gameplay on them.
+      // can replace the fallback without blocking gameplay on them
       requestMCQs()
         .then((data) => set({ data, currentIndex: 0, error: null }))
         .catch(() => {
-          // keep showing the fallback
+          // Keep showing the fallback
         });
     }
   },
 
+  // Return the current quiz and its hints, then advance to the next one
   nextQuiz: () => {
     const { data, currentIndex } = get();
 
@@ -143,5 +146,6 @@ export const useMCStore = create<MCStore>((set, get) => ({
     return { quiz, hints };
   },
 
+  // Reset the quiz index back to the start
   resetQuizProgress: () => set({ currentIndex: 0 }),
 }));

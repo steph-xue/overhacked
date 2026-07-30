@@ -7,7 +7,7 @@
 </h4>
 
 <p align="center">
-  <video src="https://github.com/user-attachments/assets/2e9fa9cf-fa4e-4b84-a2d3-502f0107b06f" width="500" style="max-width:500px;" controls></video>
+  <img src="docs/images/logo.png" alt="landing" width="400"/>
 </p>
 
 <p align="center">
@@ -186,7 +186,7 @@ Triggered when the two-minute timer runs out before the progress bar is filled, 
 | Game Engine | Phaser |
 | Backend | FastAPI, Python |
 | Libraries | CrewAI (builds and runs the quiz and hint generating AI agents),<br>LangChain (connects the AI agents to OpenAI's models),<br>Zustand (manages state across the game's stores),<br>React Confetti (displays the win animation) |
-| APIs | OpenAI GPT-4o (generates personalized quiz questions and contextual hints) |
+| APIs | OpenAI API (generates quiz questions and hints based on the years of experience and favourite language entered) |
 | Deployment | Render |
 
 <br>
@@ -250,17 +250,17 @@ Follow the steps below to set up and run the application on your own machine. Th
 
 **Prerequisites**
 
-Make sure Node.js and Python 3.10–3.13 are installed before you begin (required by crewai which doesn't support 3.14+ yet). You can check each by running the commands below, which should print a version number. The Python command uses 3.12 as an example, but any version in that range works.
-
-> **Note:** On Windows, replace `python3.12` with `python` in the commands below.
+Make sure Node.js, npm, and Python 3 are installed before you begin. You can check all three by running the commands below, which should each print a version number.
+> **Note:** This project requires Node.js 20.9+, per Next.js 16's supported versions. It also requires Python 3.10–3.13, since crewai 1.8.1 doesn't support Python 3.14+ yet.
 ```bash
 node --version
-python3.12 --version
+npm --version
+python3 --version  # On Windows use: python --version
 ```
 
 <br>
 
-**1. Clone the repository**
+**1. Clone the Repository**
 
 This downloads a copy of the project to your computer and moves you into the project folder.
 ```bash
@@ -268,51 +268,34 @@ git clone https://github.com/steph-xue/overhacked.git
 cd overhacked
 ```
 
-**2. Set up environment variables**
+**2. Set Up Environment Variables**
 
 Create a `.env` file inside the `backend` folder with your OpenAI API key.
 ```bash
-OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here  # OpenAI API key
 ```
 
-**3. Set up the backend environment**
+**3. Set Up the Backend**
 
 From the project root, move into the backend folder and create a Python virtual environment.
 ```bash
 cd backend
-python3.12 -m venv venv
-source venv/bin/activate      # On Windows use: venv\Scripts\activate
+python3 -m venv .venv       # On Windows use: python -m venv .venv
+source .venv/bin/activate   # On Windows use: .venv\Scripts\activate
 ```
 
-**4. Install the backend dependencies**
-
-Install all dependencies like FastAPI, CrewAI, and everything else the backend needs to run.
+Install all of its dependencies and start the backend development server.
 ```bash
 pip install -r requirements.txt
-```
-
-**5. Start the backend server**
-
-This runs the FastAPI backend using Uvicorn.
-```bash
 uvicorn main:app --reload --port 8000
 ```
 
-Once the server is running, the backend will be available at `http://127.0.0.1:8000`.
+**4. Set Up the Frontend**
 
-**6. Install the frontend dependencies**
-
-In a new terminal, navigate to the frontend folder and install React, Next.js, and everything else the frontend needs to run.
+In a separate terminal window from the project root, move into the frontend folder, install all of its dependencies, and start the frontend development server.
 ```bash
 cd frontend
 npm install
-```
-
-**7. Start the frontend development server**
-
-This runs the frontend locally.
-```bash
 npm run dev
 ```
-
-Once both servers are running, the frontend will be available at `http://localhost:3000`.
+Once both servers are running, open the local frontend URL displayed in the terminal to start using the application.

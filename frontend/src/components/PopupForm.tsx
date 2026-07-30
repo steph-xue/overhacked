@@ -14,6 +14,7 @@ interface PopupFormData {
   favouriteLanguage: string;
 }
 
+// Collects the player's name, experience, and favourite language before starting the game
 export default function PopupForm({ onClose }: PopupFormProps) {
   const router = useRouter();
   const setUser = useUserStore((state) => state.setUser); // Zustand setter
@@ -24,19 +25,19 @@ export default function PopupForm({ onClose }: PopupFormProps) {
     favouriteLanguage: "",
   });
 
+  // Update form state as the player types, converting yearsOfExperience to a number
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    // Convert yearsOfExperience to number
     setFormData((prev) => ({
       ...prev,
       [name]: name === "yearsOfExperience" ? Number(value) : value,
     }));
   };
 
+  // Save the form data to the Zustand store and navigate into the game
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // Update Zustand store
     setUser(formData);
 
     onClose();

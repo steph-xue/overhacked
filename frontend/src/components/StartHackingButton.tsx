@@ -9,6 +9,7 @@ const silkscreen = Silkscreen({
   weight: ["400", "700"],
 });
 
+// Landing page button that opens the player entry form
 export default function StartHackingButton() {
     const [isOpen, setIsOpen] = useState(false);
 

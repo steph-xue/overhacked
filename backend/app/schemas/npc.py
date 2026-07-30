@@ -1,46 +1,42 @@
-# Router lets you group endpoints together
-from fastapi import APIRouter
-# Allows us to define data to be expected, type for each field
 from pydantic import BaseModel, Field
 from typing import Optional, List, Literal, Union
 
-# This is the router for all NPC-related endpoints (NON-MENTOR ONLY)
-
-router = APIRouter()
-
-# For INTERACTING WITH THE NPC TEAMMATE ONLY
+# Request to interact with an NPC teammate
 class NPCInteractRequest(BaseModel):
     session_id: str
     npc_name: str
-    
+
+# Request for a multiple choice quiz question
 class MCQRequest(BaseModel):
-    # session_id: str??
     username: str
     experience: int
     language: str
 
+# Request for a coding quiz (drag-and-drop) question
 class CodingQuizRequest(BaseModel):
     language: str = Field(..., examples=["Java", "Python", "C#"])
     experience: int = Field(..., ge=0, le=50, examples=[0, 2, 5])
-    username: Optional[str] = Field(None, examples=["Sam"])  # only if you want personalization
+    username: Optional[str] = Field(None, examples=["Sam"])  # Only used if personalization is desired
 
+# Response containing a coding quiz question, its answer, and hints
 class CodingQuizResponse(BaseModel):
     question: str
-    answer: List[str]  # each element is one line, preserving formatting
-    hints: Optional[List[str]] = None  # include only if you generate hints too
-    
-# The Drag and Drop Item structure
+    answer: List[str]  # Each element is one line, preserving formatting
+    hints: Optional[List[str]] = None  # Only included if hints were generated
+
+# A single draggable line of code in a drag-and-drop question
 class DragDropItem(BaseModel):
     id: Optional[str] = None
     text: str
 
+# Request to generate a drag-and-drop question
 class DragDropGenerateRequest(BaseModel):
     language: str
     experience: int
     username: Optional[str] = None
     question_mode: Literal["reorder"] = "reorder"
 
-# The Drag and Drop Question response we get back from the NPC after the initial player interaction
+# Drag-and-drop question response returned by the NPC after the initial player interaction
 class DragDropQuestion(BaseModel):
     question_type: Literal["drag_drop"]
     question_mode: Literal["reorder"]
@@ -48,23 +44,25 @@ class DragDropQuestion(BaseModel):
     items_to_drag: List[str]
     drop_zones: List[str]
 
-# The Debugging Question response we get back from the NPC after the initial player interaction
+# Debugging question response returned by the NPC after the initial player interaction
 class DebuggingResponse(BaseModel):
     question_type: Literal["debug"]
     question_text: str
     code_snippet: str
 
-# The response provided back from the NPC after the player submits their debugging solution
+# Response returned after the player submits their debugging solution
 class Debugging_AnswerResponse(BaseModel):
     is_correct: bool
     corrected_code: Optional[str] = None
     explanation: Optional[str] = None
 
+# A single multiple choice question with its answer choices
 class MCQItem(BaseModel):
     question: str
     choices: List[str]
     answer: int
 
+# Response containing multiple choice quiz questions and their hints
 class MCQResponse(BaseModel):
     quizzes: List[MCQItem]
     hints: List[List[str]]

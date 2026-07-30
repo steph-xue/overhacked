@@ -5,6 +5,7 @@ import type Phaser from "phaser";
 import Confetti from "react-confetti";
 import { createGameConfig } from "@/game/config";
 
+// Mounts the Phaser game canvas and shows confetti when the player wins
 export default function PhaserGame() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -33,7 +34,7 @@ export default function PhaserGame() {
 
       if (destroyed || !containerRef.current) return;
 
-      // await the async config (SSR-safe)
+      // Await the async config (SSR-safe)
       const config = await createGameConfig(containerRef.current);
       if (destroyed) return;
 

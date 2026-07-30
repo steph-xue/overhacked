@@ -1,10 +1,12 @@
 import os
 
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import mcq_router, coding_quiz_router
+
 # Create FastAPI instance
 app = FastAPI()
+
 # Configure CORS
 # ALLOWED_ORIGINS is a comma-separated list, e.g. "https://overhacked.onrender.com,https://example.com"
 origins = [
@@ -15,20 +17,19 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # allow specific origins
+    allow_origins=origins,  # Allow specific origins
     allow_credentials=True,
-    allow_methods=["*"],    # allow all HTTP methods
-    allow_headers=["*"],    # allow all headers
+    allow_methods=["*"],    # Allow all HTTP methods
+    allow_headers=["*"],    # Allow all headers
 )
 
-router = APIRouter()
 
-
-# Root Directory - Just for testing for now
+# Root directory, just for testing for now
 @app.get("/")
 def root():
     return {"message": "Welcome to the FastAPI backend!"}
 
-# MCQ router
+
+# Register the MCQ and coding quiz routers
 app.include_router(mcq_router)
 app.include_router(coding_quiz_router)

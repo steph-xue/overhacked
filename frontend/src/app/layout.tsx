@@ -7,6 +7,7 @@ const silkscreen = Silkscreen({
   subsets: ["latin"],
 });
 
+// Root layout shared by all pages, sets up global styles and fonts
 export default function RootLayout({
   children,
 }: {

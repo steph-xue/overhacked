@@ -8,6 +8,7 @@ export default class LoadingDialog {
 
   private onCancel?: () => void;
 
+  // Build and fade in the loading panel with an animated "Loading..." label
   constructor(scene: Phaser.Scene, onCancel?: () => void) {
     this.onCancel = onCancel;
 
@@ -24,7 +25,7 @@ export default class LoadingDialog {
     const overlay = scene.add
       .rectangle(0, 0, scene.scale.width, scene.scale.height, 0x000000, 0.35)
       .setOrigin(0.5)
-      .setInteractive(); // block input behind dialog
+      .setInteractive(); // Block input behind dialog
 
     // Panel (flat rectangle)
     const panel = scene.add.rectangle(0, 0, W, H, 0xf3e9d9);
@@ -86,6 +87,7 @@ export default class LoadingDialog {
     });
   }
 
+  // Stop the dot animation and destroy the dialog
   destroy() {
     this.dotTimer?.remove(false);
     this.root.destroy(true);

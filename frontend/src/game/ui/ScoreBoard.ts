@@ -43,10 +43,12 @@ export default class ScoreBoard {
   private readonly GAP = 10;     // gap between bar and timer
   private readonly RADIUS = 10;  // rounded corners
 
+  // Store the scene this HUD will render into
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
   }
 
+  // Render the progress bar and timer, and start listening for canvas resizes
   mount(args?: { onTimeUp?: () => void }) {
     this.onTimeUp = args?.onTimeUp;
 
@@ -102,6 +104,7 @@ export default class ScoreBoard {
     this.setProgress(this.progress);
   }
 
+  // Stop the timer, detach the resize listener, and destroy the HUD
   unmount() {
     this.timerEvent?.remove(false);
     this.timerEvent = undefined;
@@ -139,6 +142,7 @@ export default class ScoreBoard {
     });
   }
 
+  // Stop the countdown without removing the HUD
   stopTimer() {
     this.timerEvent?.remove(false);
     this.timerEvent = undefined;
@@ -159,6 +163,7 @@ export default class ScoreBoard {
     this.setProgress(done / total);
   }
 
+  // Seconds left on the countdown
   getRemainingSeconds() {
     return this.remainingSeconds;
   }
@@ -167,8 +172,9 @@ export default class ScoreBoard {
   // Internals
   // -------------------------
 
+  // Redraw the green progress fill based on the current progress value
   private redrawBarFill() {
-    // barFill is a graphics object positioned at (PAD, topOfBar) already
+    // barFill is a graphics object positioned at (PAD, topOfBar) already,
     // so draw at local (0, 0)
     this.barFill.clear();
 
@@ -184,6 +190,7 @@ export default class ScoreBoard {
     }
   }
 
+  // Format remainingSeconds as M:SS and update the timer label
   private updateTimerText() {
     const m = Math.floor(this.remainingSeconds / 60);
     const s = this.remainingSeconds % 60;
@@ -191,8 +198,8 @@ export default class ScoreBoard {
     this.timerText.setText(`${m}:${ss}`);
   }
 
+  // Pin the HUD to the top-left corner of the canvas
   private reposition() {
-    // very tight corner
     this.root.setPosition(this.X, this.Y);
   }
 }

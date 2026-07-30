@@ -7,10 +7,12 @@ export default class WinningDialog {
 
   private objects: Phaser.GameObjects.GameObject[] = [];
 
+  // Store the scene this dialog will render into
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
   }
 
+  // Render the victory panel with play-again and quit buttons
   mount(args?: { onPlayAgain?: () => void; onQuit?: () => void }) {
     const s = this.scene;
     const { width, height } = s.scale;
@@ -73,6 +75,7 @@ export default class WinningDialog {
     const BUTTON_Y = PANEL_H / 2 - 90;
     const GAP = 34;
 
+    // Create a clickable rectangle-and-label button at the given x offset
     const createButton = (x: number, label: string, onClick: () => void) => {
       const rect = s.add
         .rectangle(x, BUTTON_Y, BUTTON_W, BUTTON_H, 0x000000, 0.12)
@@ -106,6 +109,7 @@ export default class WinningDialog {
     s.scale.on("resize", this.onResize, this);
   }
 
+  // Destroy all rendered objects and detach the resize listener
   unmount() {
     this.scene.scale.off("resize", this.onResize, this);
 
@@ -115,6 +119,7 @@ export default class WinningDialog {
     this.root?.destroy();
   }
 
+  // Re-center the dialog when the game canvas is resized
   private onResize() {
     const { width, height } = this.scene.scale;
     if (this.root) this.root.setPosition(width / 2, height / 2);

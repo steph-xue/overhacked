@@ -18,6 +18,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 # Define the LLM
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0.5)
 
+# Send a prompt to the AI agent and return its generated coding quiz and hints
 @coding_quiz_router.post("/coding_quiz", response_model=CodingQuizResponse)
 async def ask_agent(request: CodingQuizRequest) -> CodingQuizResponse:
     language = request.language
@@ -119,8 +120,8 @@ async def ask_agent(request: CodingQuizRequest) -> CodingQuizResponse:
         result = coding_quiz_crew.kickoff({"topic": "Create a coding quiz"})
 
         quiz_raw = result.tasks_output[0].raw
-        
-        # Removed hints for now
+
+        # Raw hints output from the hints task
         hints_raw = result.tasks_output[1].raw
 
         # Strip code fences if the model adds them

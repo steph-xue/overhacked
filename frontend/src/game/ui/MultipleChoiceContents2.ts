@@ -1,6 +1,5 @@
-// src/game/ui/MultipleChoiceContents.ts
+// src/game/ui/MultipleChoiceContents2.ts
 import * as Phaser from "phaser";
-// import { useNpcStore } from "@/stores/useNpcStore";
 
 type QuestionData = {
   question: string;
@@ -29,6 +28,7 @@ export default class MultipleChoiceContents2 {
 
   private quiz: QuestionData;
 
+  // Store the scene, container, content width, quiz, and answer callback
   constructor(
     scene: Phaser.Scene,
     root: Phaser.GameObjects.Container,
@@ -43,13 +43,9 @@ export default class MultipleChoiceContents2 {
     this.quiz = quiz;
   }
 
+  // Render the multiple choice question and answer options into the dialog
   mount() {
     const s = this.scene;
-
-    // -------------------------
-    // DATA SOURCE (API or fallback)
-    // -------------------------
-    // const { data, loading, error } = useNpcStore.getState();
 
     const fallback: QuestionData = {
       question:
@@ -57,17 +53,6 @@ export default class MultipleChoiceContents2 {
       choices: ["Encapsulation", "Abstraction", "Inheritance", "Polymorphism"],
       answer: 3,
     };
-
-    // if (loading) {
-    //   const txt = s.add.text(0, 0, "Loading question...", {
-    //     fontFamily: "Silkscreen",
-    //     fontSize: "32px",
-    //     color: "#4A3F35",
-    //   });
-    //   this.root.add(txt);
-    //   this.objects.push(txt);
-    //   return;
-    // }
 
     const questionData =
       this.quiz?.question && this.quiz.choices?.length ? this.quiz : fallback;
@@ -177,6 +162,7 @@ export default class MultipleChoiceContents2 {
     this.objects.push(this.submitRect, this.submitText);
   }
 
+  // Destroy all rendered objects and reset local state
   unmount() {
     this.objects.forEach((o) => o.destroy());
     this.objects = [];
@@ -186,6 +172,7 @@ export default class MultipleChoiceContents2 {
     this.submitted = false;
   }
 
+  // Highlight the chosen option and record its index
   private select(i: number) {
     this.selectedIndex = i;
 
@@ -193,6 +180,7 @@ export default class MultipleChoiceContents2 {
     this.optionRects[i].setFillStyle(0x000000, 0.25);
   }
 
+  // Lock in the selected answer and highlight it correct or incorrect
   private submit() {
     if (this.selectedIndex === null) return;
 
