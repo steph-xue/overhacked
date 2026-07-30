@@ -79,7 +79,7 @@ export default function PopupForm({ onClose }: PopupFormProps) {
 
           <div className="flex flex-col">
             <label className="text-[#4A3F35] text-sm mb-1">
-              Favourite Language (Object Oriented)
+              Favourite Language (Object-Oriented)
             </label>
             <input
               type="text"
