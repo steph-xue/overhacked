@@ -298,4 +298,4 @@ cd frontend
 npm install
 npm run dev
 ```
-Once both servers are running, open the local frontend URL displayed in the terminal to start using the application.
+Once both servers are running, open the local frontend URL displayed in the terminal to start the application.
